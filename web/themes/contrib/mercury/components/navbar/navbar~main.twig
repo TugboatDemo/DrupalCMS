@@ -1,0 +1,12 @@
+{% embed 'mercury:navbar' %}
+  {% block logo %}
+    {# will fix to use: {{ include('@mercury/components/branding/branding.twig') }} #}
+    <a href="{{ url|default('/') }}" class="branding hg:inline-block" rel="home">
+      <img src="{{  componentMetadata.path ~ '/' ~ storybook.media.src }}" alt="{{ storybook.media.alt }}" class="hg:w-full hg:h-full hg:object-contain"/>
+    </a>
+  {% endblock %}
+
+  {% block navigation %}
+    {{ include('@mercury/components/dropdown-menu/dropdown-menu.twig', storybook.menu) }}
+  {% endblock %}
+{% endembed %}

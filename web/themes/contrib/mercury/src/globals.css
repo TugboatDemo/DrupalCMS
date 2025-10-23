@@ -1,0 +1,14 @@
+:root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.layout-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Override the moderation form block background */
+.entity-moderation-form {
+  background: inherit;
+}

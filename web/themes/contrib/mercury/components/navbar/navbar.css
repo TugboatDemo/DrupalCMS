@@ -1,0 +1,77 @@
+/*! tailwindcss v4.1.13 | MIT License | https://tailwindcss.com */
+@layer components;
+:root.navbar-modal-open {
+  &, body {
+    overflow: hidden;
+  }
+}
+.navbar--menu {
+  display: grid;
+  background-color: var(--hg-color-body-bg, #ffffff);
+  @media (width >= 48rem) {
+    display: flex;
+  }
+}
+.navbar--menu:not(.navbar--menu--open) {
+  display: none;
+  @media (width >= 48rem) {
+    display: flex;
+  }
+}
+body.path-xb {
+  .navbar--logo, .navbar--links {
+    min-width: calc(var(--hg-spacing, 4px) * 12);
+  }
+}
+.navbar--links .button.button {
+  margin-inline: calc(var(--hg-spacing, 4px) * 8);
+  width: calc(100% - var(--hg-spacing) * 16);
+  @media (width >= 48rem) {
+    margin: auto;
+  }
+  @media (width >= 48rem) {
+    width: auto;
+  }
+}
+.navbar--dropdown-menu .dropdown-menu {
+  width: 100%;
+  @media (width >= 48rem) {
+    width: auto;
+  }
+}
+.navbar--dropdown-menu-wrapper > :last-child {
+  padding-bottom: calc(var(--hg-spacing, 4px) * 24);
+  @media (width >= 48rem) {
+    padding-bottom: calc(var(--hg-spacing, 4px) * 0);
+  }
+}
+.region-header {
+  .navbar {
+    padding-inline: calc(var(--hg-spacing, 4px) * 0);
+  }
+  .navbar--modal-top {
+    padding-inline: calc(var(--hg-spacing, 4px) * 4);
+  }
+}
+.navbar--logo, .navbar--modal-logo {
+  .branding {
+    height: calc(var(--hg-spacing, 4px) * 6);
+    @media (width >= 48rem) {
+      height: calc(var(--hg-spacing, 4px) * 7);
+    }
+    svg, img[src$=".svg"] {
+      height: auto !important;
+      max-height: 100%;
+    }
+  }
+}
+.navbar--logo > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.navbar--modal-logo > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}

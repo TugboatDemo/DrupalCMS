@@ -1,0 +1,74 @@
+$schema: 'https://git.drupalcode.org/project/drupal/-/raw/10.1.x/core/modules/sdc/src/metadata.schema.json'
+name: Button
+group: Base
+description: 'A versatile button component that can be rendered as a button or link with various styles and sizes.'
+status: stable
+props:
+  type: object
+  properties:
+    variant:
+      type: string
+      title: Variant
+      description: 'The style of button.'
+      enum:
+        - primary
+        - primary-accent
+        - secondary
+        - secondary-accent
+        - negative
+      default: primary
+      examples:
+        - primary
+    label:
+      type: string
+      title: Label
+      description: 'The text content of the button.'
+      default: 'Button Label'
+      examples:
+        - 'Button Label'
+    href:
+      type: string
+      title: Link
+    size:
+      type: string
+      title: Button size
+      enum:
+        - small
+        - medium
+        - large
+      default: medium
+      examples:
+        - medium
+    mobile_width:
+      type: boolean
+      title:  Full width on mobile
+      default: false
+    icon:
+      type: string
+      title: Icon
+      description: "Enter icon name without the 'ph-' prefix (e.g., 'user', 'heart', 'settings')."
+      enum:
+        - arrow-right
+        - arrow-left
+        - caret-right
+        - caret-left
+        - download
+        - user-plus
+      default: arrow-right
+      examples:
+        - arrow-right
+    icon_first:
+      type: boolean
+      title: Display icon first
+      description: 'By default, the icon is displayed after the label. If you want to display the icon first, set this to true.'
+      default: false
+      examples:
+        - false
+    disabled:
+      type: boolean
+      title: Disabled
+      description: 'Style button as disabled (rarely used).'
+      default: false
+      examples:
+        - false
+        - true
