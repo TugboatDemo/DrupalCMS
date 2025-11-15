@@ -38,11 +38,7 @@ class EntityLoopTest extends Base {
       'status' => TRUE,
     ])->save();
 
-    foreach (\Drupal::service('event_dispatcher')->getListeners('drupal_hook.cron') as $listener) {
-      if ($listener[0] instanceof BaseHooks) {
-        call_user_func($listener);
-      }
-    }
+    \Drupal::classResolver(BaseHooks::class)->cron();
     $this->assertStatusMessages([
       'User ' . self::USER_1_NAME,
       "User $name",

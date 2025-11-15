@@ -153,6 +153,7 @@ services:
   Drupal\eca\Event\TriggerEvent: '@eca.trigger_event'
   Drupal\eca\PluginManager\Action: '@plugin.manager.eca.action'
   Drupal\eca\Service\Actions: '@eca.service.action'
+  Drupal\eca\Service\Conditions: '@eca.service.condition'
   Drupal\eca\Service\ContentEntityTypes: '@eca.service.content_entity_types'
   Drupal\eca\Token\TokenServices: '@eca.token_services'
 

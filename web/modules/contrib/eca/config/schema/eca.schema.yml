@@ -36,6 +36,12 @@ eca.eca.*:
   type: config_entity
   label: ECA
   mapping:
+    third_party_settings:
+      requiredKey: false
+      type: sequence
+      label: 'Third party settings'
+      sequence:
+        type: model_settings.third_party.[%key]
     id:
       type: machine_name
       label: 'ID'

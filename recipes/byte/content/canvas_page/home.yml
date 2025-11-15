@@ -190,16 +190,18 @@ default:
           jsonSchema:
             type: object
             properties:
+              alt:
+                type: string
+              height:
+                type: integer
               src:
                 type: string
                 contentMediaType: 'image/*'
                 format: uri-reference
-                pattern: '^(/|https?://)?(?!.*\://)[^\s]+$'
-              alt:
-                type: string
+                x-allowed-schemes:
+                  - http
+                  - https
               width:
-                type: integer
-              height:
                 type: integer
             required:
               - src
@@ -218,16 +220,18 @@ default:
           jsonSchema:
             type: object
             properties:
+              alt:
+                type: string
+              height:
+                type: integer
               src:
                 type: string
                 contentMediaType: 'image/*'
                 format: uri-reference
-                pattern: '^(/|https?://)?(?!.*\://)[^\s]+$'
-              alt:
-                type: string
+                x-allowed-schemes:
+                  - http
+                  - https
               width:
-                type: integer
-              height:
                 type: integer
             required:
               - src
@@ -246,16 +250,18 @@ default:
           jsonSchema:
             type: object
             properties:
+              alt:
+                type: string
+              height:
+                type: integer
               src:
                 type: string
                 contentMediaType: 'image/*'
                 format: uri-reference
-                pattern: '^(/|https?://)?(?!.*\://)[^\s]+$'
-              alt:
-                type: string
+                x-allowed-schemes:
+                  - http
+                  - https
               width:
-                type: integer
-              height:
                 type: integer
             required:
               - src
@@ -274,16 +280,18 @@ default:
           jsonSchema:
             type: object
             properties:
+              alt:
+                type: string
+              height:
+                type: integer
               src:
                 type: string
                 contentMediaType: 'image/*'
                 format: uri-reference
-                pattern: '^(/|https?://)?(?!.*\://)[^\s]+$'
-              alt:
-                type: string
+                x-allowed-schemes:
+                  - http
+                  - https
               width:
-                type: integer
-              height:
                 type: integer
             required:
               - src
@@ -302,16 +310,18 @@ default:
           jsonSchema:
             type: object
             properties:
+              alt:
+                type: string
+              height:
+                type: integer
               src:
                 type: string
                 contentMediaType: 'image/*'
                 format: uri-reference
-                pattern: '^(/|https?://)?(?!.*\://)[^\s]+$'
-              alt:
-                type: string
+                x-allowed-schemes:
+                  - http
+                  - https
               width:
-                type: integer
-              height:
                 type: integer
             required:
               - src
@@ -330,16 +340,18 @@ default:
           jsonSchema:
             type: object
             properties:
+              alt:
+                type: string
+              height:
+                type: integer
               src:
                 type: string
                 contentMediaType: 'image/*'
                 format: uri-reference
-                pattern: '^(/|https?://)?(?!.*\://)[^\s]+$'
-              alt:
-                type: string
+                x-allowed-schemes:
+                  - http
+                  - https
               width:
-                type: integer
-              height:
                 type: integer
             required:
               - src
@@ -576,16 +588,18 @@ default:
           jsonSchema:
             type: object
             properties:
+              alt:
+                type: string
+              height:
+                type: integer
               src:
                 type: string
                 contentMediaType: 'image/*'
                 format: uri-reference
-                pattern: '^(/|https?://)?(?!.*\://)[^\s]+$'
-              alt:
-                type: string
+                x-allowed-schemes:
+                  - http
+                  - https
               width:
-                type: integer
-              height:
                 type: integer
             required:
               - src

@@ -2,11 +2,10 @@
 
 namespace Drupal\eca_form\Hook;
 
+use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\eca\Hook\TokenHooks as EcaTokenHooks;
-use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface as SymfonyEventDispatcherInterface;
 
 /**
  * Implements token hooks for the ECA Form submodule.
@@ -17,7 +16,7 @@ class TokenHooks {
    * Constructs a new TokenHooks object.
    */
   public function __construct(
-    protected EventDispatcherInterface $eventDispatcher,
+    protected ClassResolverInterface $classResolver,
   ) {}
 
   /**
@@ -75,13 +74,7 @@ class TokenHooks {
       // through.
       $data['dto'] = $data['current_form'];
       unset($data['current_form']);
-      if ($this->eventDispatcher instanceof SymfonyEventDispatcherInterface) {
-        foreach ($this->eventDispatcher->getListeners('drupal_hook.tokens') as $listener) {
-          if ($listener[0] instanceof EcaTokenHooks) {
-            return call_user_func($listener, 'dto', $tokens, $data, $options, $bubbleable_metadata);
-          }
-        }
-      }
+      $this->classResolver->getInstanceFromDefinition(EcaTokenHooks::class)->tokens('dto', $tokens, $data, $options, $bubbleable_metadata);
     }
     return [];
   }

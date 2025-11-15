@@ -197,7 +197,7 @@ final class DocsCommands extends DrushCommands {
    *   The ECA plugin for which documentation should be created.
    */
   private function pluginDoc(PluginInspectionInterface $plugin): void {
-    if (!empty($plugin->getPluginDefinition()['nodocs'])) {
+    if (!empty($plugin->getPluginDefinition()['nodocs']) || !empty($plugin->getPluginDefinition()['no_docs'])) {
       return;
     }
     $values = $this->getPluginValues($plugin);

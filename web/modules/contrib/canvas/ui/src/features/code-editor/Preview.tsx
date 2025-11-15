@@ -15,9 +15,11 @@ import {
 import {
   getDataDependenciesFromAst,
   getImportsFromAst,
+} from '@/features/code-editor/utils/ast-utils';
+import {
   getPropValuesForPreview,
   getSlotNamesForPreview,
-} from '@/features/code-editor/utils';
+} from '@/features/code-editor/utils/utils';
 import { useGetCodeComponentsQuery } from '@/services/componentAndLayout';
 import {
   getBaseUrl,
@@ -265,31 +267,6 @@ const Preview = ({ isLoading = false }: { isLoading?: boolean }) => {
     props,
     slots,
   ]);
-
-  // Add an invisible overlay to the iframe when the Mosaic window is being resized.
-  // This prevents the iframe from intercepting mouse events from the parent Mosaic window.
-  // This is necessary because when a user is resizing their preview window, and their mouse enters the iframe,
-  // the parent window stops receiving mouse events so the resizing stops.
-  useEffect(() => {
-    const handleOnChange = () => {
-      if (parentRef.current) {
-        parentRef.current.classList.add('iframe-overlay');
-      }
-    };
-    const handleOnRelease = () => {
-      if (parentRef.current) {
-        parentRef.current.classList.remove('iframe-overlay');
-      }
-    };
-
-    window.addEventListener('mosaicOnChange', handleOnChange);
-    window.addEventListener('mosaicOnRelease', handleOnRelease);
-
-    return () => {
-      window.removeEventListener('mosaicOnChange', handleOnChange);
-      window.removeEventListener('mosaicOnRelease', handleOnRelease);
-    };
-  }, []);
 
   const renderCompileError = () => (
     <ErrorCard

@@ -14,11 +14,11 @@ default:
       title: ''
       options:
         icon:
-          target_id: 'social:linkedin'
+          target_id: 'phosphor:linkedin-logo'
           settings:
             social:
               size: '32'
-              color: '#000000'
+              color: '#ffffff'
               alt: ''
         icon_display: icon_only
   external:

@@ -47,7 +47,7 @@ test_dependencies:
   # For the 5 other components we're using in tests.
   - drupal:sdc_test
 
-# Information added by Drupal.org packaging script on 2025-10-22
-version: '1.0.0-rc2'
+# Information added by Drupal.org packaging script on 2025-11-14
+version: '1.0.0-rc4'
 project: 'canvas'
-datestamp: 1761151901
+datestamp: 1763149713
