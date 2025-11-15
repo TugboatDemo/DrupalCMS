@@ -1,0 +1,59 @@
+uuid: dfb1ce7b-63cd-4b9e-af64-77cc49180df2
+langcode: en
+status: true
+dependencies:
+  theme:
+    - mercury
+active_version: e9f7eb95d2995d12
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        description:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: 'Atque libero fuga blanditiis quo qui impedit debitis. Aut ut nam unde velit.'
+          expression: ℹ︎string␟value
+        event_date:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: '2026-02-12'
+          expression: ℹ︎string␟value
+        place:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: '29013 Bednar Spurs'
+          expression: ℹ︎string␟value
+        title:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: Transition
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+label: Event
+id: sdc.mercury.card-events
+provider: mercury
+source: sdc
+source_local_id: 'mercury:card-events'
+category: Components/Cards

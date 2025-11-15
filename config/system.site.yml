@@ -1,0 +1,15 @@
+_core:
+  default_config_hash: HlN7eAN2N4JIHsYv56V4E7sqC9bS609KwvGFjyD_mgk
+langcode: en
+uuid: d0674efc-f59e-4eb3-b3ab-f44736f2f96c
+name: Tugboat
+mail: admin@example.com
+slogan: ''
+page:
+  403: /user/login
+  404: /404
+  front: /page/8
+admin_compact_mode: false
+weight_select_max: 100
+default_langcode: en
+mail_notification: null

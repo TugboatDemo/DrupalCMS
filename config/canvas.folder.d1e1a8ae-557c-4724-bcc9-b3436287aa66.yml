@@ -1,0 +1,9 @@
+uuid: d1e1a8ae-557c-4724-bcc9-b3436287aa66
+langcode: en
+status: true
+dependencies: {  }
+name: Components/Tiles
+configEntityTypeId: component
+weight: 0
+items:
+  - sdc.mercury.tile-logo

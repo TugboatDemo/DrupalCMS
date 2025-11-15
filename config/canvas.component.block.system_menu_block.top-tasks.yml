@@ -1,0 +1,28 @@
+uuid: d53c99a4-7861-43a9-922e-fe884da3a496
+langcode: en
+status: false
+dependencies:
+  config:
+    - system.menu.top-tasks
+  module:
+    - system
+active_version: 21ceb5e0f5bbce8f
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'system_menu_block:top-tasks'
+        label: 'Top tasks'
+        label_display: '0'
+        provider: system
+        level: 1
+        depth: null
+        expand_all_items: false
+    fallback_metadata:
+      slot_definitions: null
+label: 'Top tasks'
+id: block.system_menu_block.top-tasks
+provider: system
+source: block
+source_local_id: 'system_menu_block:top-tasks'
+category: Menus

@@ -1,0 +1,57 @@
+uuid: c45df470-9ef2-4881-b7bb-7d68b8d9e030
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+  theme:
+    - mercury
+active_version: 9620772be2140001
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        behavior_desktop:
+          required: false
+          field_type: list_string
+          field_storage_settings:
+            allowed_values_function: canvas_load_allowed_values_for_component_prop
+          field_instance_settings: {  }
+          field_widget: options_select
+          default_value:
+            -
+              value: '4'
+          expression: ℹ︎list_string␟value
+        behavior_mobile:
+          required: false
+          field_type: list_string
+          field_storage_settings:
+            allowed_values_function: canvas_load_allowed_values_for_component_prop
+          field_instance_settings: {  }
+          field_widget: options_select
+          default_value:
+            -
+              value: scroll
+          expression: ℹ︎list_string␟value
+        behavior_tablet:
+          required: false
+          field_type: list_string
+          field_storage_settings:
+            allowed_values_function: canvas_load_allowed_values_for_component_prop
+          field_instance_settings: {  }
+          field_widget: options_select
+          default_value:
+            -
+              value: '2'
+          expression: ℹ︎list_string␟value
+    fallback_metadata:
+      slot_definitions:
+        logos:
+          title: 'Logo components'
+          description: 'Components to arrange in a grid or horizontal scroller.'
+label: 'Logo Grid'
+id: sdc.mercury.logo-grid
+provider: mercury
+source: sdc
+source_local_id: 'mercury:logo-grid'
+category: Layout

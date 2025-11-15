@@ -1,0 +1,10 @@
+uuid: 218104ad-186f-48b2-bcd6-12d3fb44f53a
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: PCPB4xLkBHqBQQMsCwPFWwMU-IVOPiaQQTZp7-GU_ic
+id: utility
+label: Utility
+description: 'Utility and compliance pages.'
+locked: false

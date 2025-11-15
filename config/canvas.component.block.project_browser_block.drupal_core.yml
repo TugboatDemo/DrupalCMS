@@ -1,0 +1,28 @@
+uuid: 79f920da-dacf-46d5-be74-f14aa9d2f9a6
+langcode: en
+status: false
+dependencies:
+  module:
+    - project_browser
+active_version: 11512edd31bf87df
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'project_browser_block:drupal_core'
+        label: 'Core modules'
+        label_display: '0'
+        provider: project_browser
+        paginate: true
+        page_sizes: '12, 24, 36, 48'
+        sort_options: null
+        default_sort: null
+        filters: null
+    fallback_metadata:
+      slot_definitions: null
+label: 'Core modules'
+id: block.project_browser_block.drupal_core
+provider: project_browser
+source: block
+source_local_id: 'project_browser_block:drupal_core'
+category: 'Project Browser'

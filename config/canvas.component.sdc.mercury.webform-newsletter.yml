@@ -1,0 +1,19 @@
+uuid: f315d411-1b50-420c-95fb-f1fffcf071e0
+langcode: en
+status: true
+dependencies:
+  theme:
+    - mercury
+active_version: 8fe3be948e0194e1
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions: {  }
+    fallback_metadata:
+      slot_definitions: {  }
+label: Newsletter
+id: sdc.mercury.webform-newsletter
+provider: mercury
+source: sdc
+source_local_id: 'mercury:webform-newsletter'
+category: Webform

@@ -1,0 +1,29 @@
+uuid: ad0e9779-d4bb-4ce1-a60c-ad6fe3612332
+langcode: en
+status: true
+dependencies:
+  theme:
+    - mercury
+active_version: '5524813695409257'
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        id:
+          required: true
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: anchor-id
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+label: Anchor
+id: sdc.mercury.anchor
+provider: mercury
+source: sdc
+source_local_id: 'mercury:anchor'
+category: Components

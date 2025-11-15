@@ -1,0 +1,27 @@
+uuid: 32b0296f-7dd5-441b-8dda-7225f4a42bc8
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.blog
+  module:
+    - views
+active_version: 3b957dd5ed64e9a8
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'views_block:blog-all'
+        label: 'Blog: All blog posts'
+        label_display: '0'
+        provider: views
+        views_label: ''
+        items_per_page: null
+    fallback_metadata:
+      slot_definitions: null
+label: 'Blog: All blog posts'
+id: block.views_block.blog-all
+provider: views
+source: block
+source_local_id: 'views_block:blog-all'
+category: 'Lists (Views)'

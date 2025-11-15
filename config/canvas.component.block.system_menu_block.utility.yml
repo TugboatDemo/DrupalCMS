@@ -1,0 +1,30 @@
+uuid: 5279fe24-b93e-4ddb-9980-718c81b050b9
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.utility
+  module:
+    - system
+_core:
+  default_config_hash: Vx9Z0Z0O6WpQ9jqMB3F1DhCr4M_JA_zpakyDZsi7DpE
+active_version: 78f97c64933451c0
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'system_menu_block:utility'
+        label: Utility
+        label_display: '0'
+        provider: system
+        level: 1
+        depth: null
+        expand_all_items: false
+    fallback_metadata:
+      slot_definitions: null
+label: Utility
+id: block.system_menu_block.utility
+provider: system
+source: block
+source_local_id: 'system_menu_block:utility'
+category: Menus

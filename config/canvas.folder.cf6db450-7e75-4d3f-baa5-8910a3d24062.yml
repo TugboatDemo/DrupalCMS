@@ -1,0 +1,9 @@
+uuid: cf6db450-7e75-4d3f-baa5-8910a3d24062
+langcode: en
+status: true
+dependencies: {  }
+name: UI
+configEntityTypeId: component
+weight: 0
+items:
+  - sdc.mercury.navbar-search

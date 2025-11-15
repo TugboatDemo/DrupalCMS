@@ -1,0 +1,11 @@
+uuid: 28f3b41e-e46b-4c80-8fec-3064dca21262
+langcode: en
+status: true
+dependencies: {  }
+name: Components
+configEntityTypeId: component
+weight: 0
+items:
+  - sdc.mercury.anchor
+  - sdc.mercury.cta
+  - sdc.mercury.tile-icon

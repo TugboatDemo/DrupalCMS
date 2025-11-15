@@ -1,0 +1,10 @@
+uuid: f2002cc7-206e-4d5a-bbb2-d7fd6f4ac8a4
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: DaAAmHlWMVahC2MmhRKQN8Lun9hBPT6LR6PCjkCEikI
+id: analytics
+label: Analytics
+description: ''
+weight: 1

@@ -1,0 +1,10 @@
+uuid: 719a9542-4907-4460-9f39-e6fa0d1d3234
+langcode: en
+status: true
+dependencies: {  }
+name: Webform
+configEntityTypeId: component
+weight: 0
+items:
+  - block.webform_block
+  - sdc.mercury.webform-newsletter

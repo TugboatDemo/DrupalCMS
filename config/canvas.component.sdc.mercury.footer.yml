@@ -1,0 +1,41 @@
+uuid: 9cefe5f1-87a9-4208-92bf-de7f7eac1c1d
+langcode: en
+status: true
+dependencies:
+  theme:
+    - mercury
+active_version: d696cea1796b650e
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        align:
+          required: false
+          field_type: boolean
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: boolean_checkbox
+          default_value:
+            -
+              value: true
+          expression: ℹ︎boolean␟value
+    fallback_metadata:
+      slot_definitions:
+        footer_first:
+          title: 'Branding & Social'
+          description: 'Stack branding and social links'
+        footer_last:
+          title: 'Call to action'
+          description: 'Add subscription webform'
+        footer_utility_first:
+          title: 'Utility links'
+          description: 'Utility links or similar'
+        footer_utility_last:
+          title: 'Copyright text'
+          description: 'For legal/copyright text.'
+label: Footer
+id: sdc.mercury.footer
+provider: mercury
+source: sdc
+source_local_id: 'mercury:footer'
+category: Layout

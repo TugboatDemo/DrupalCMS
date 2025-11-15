@@ -1,0 +1,16 @@
+uuid: 8cbdb307-4b38-4852-861d-1a853b052245
+langcode: en
+status: true
+dependencies: {  }
+name: Layout
+configEntityTypeId: component
+weight: 0
+items:
+  - sdc.mercury.footer
+  - sdc.mercury.group
+  - sdc.mercury.hero-billboard
+  - sdc.mercury.hero-blog
+  - sdc.mercury.hero-full-width
+  - sdc.mercury.hero-side-by-side
+  - sdc.mercury.logo-grid
+  - sdc.mercury.section

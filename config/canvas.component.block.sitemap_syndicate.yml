@@ -1,0 +1,25 @@
+uuid: 15f26301-0c18-47df-928d-36a19491dfb6
+langcode: en
+status: true
+dependencies:
+  module:
+    - sitemap
+active_version: bdf652c3e4e95842
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: sitemap_syndicate
+        label: 'Syndicate (sitemap)'
+        label_display: '0'
+        provider: sitemap
+        cache:
+          max_age: 0
+    fallback_metadata:
+      slot_definitions: null
+label: 'Syndicate (sitemap)'
+id: block.sitemap_syndicate
+provider: sitemap
+source: block
+source_local_id: sitemap_syndicate
+category: Sitemap

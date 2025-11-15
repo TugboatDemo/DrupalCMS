@@ -1,0 +1,30 @@
+uuid: c7280bdc-3354-4784-b5a8-3f056df281fe
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.social
+  module:
+    - system
+_core:
+  default_config_hash: trJZ1on7kaKSEarBfWGfx87D7Ku3V2Q384FZBV-D028
+active_version: 2b669e6cee911c12
+versioned_properties:
+  active:
+    settings:
+      default_settings:
+        id: 'system_menu_block:social'
+        label: Social
+        label_display: '0'
+        provider: system
+        level: 1
+        depth: null
+        expand_all_items: false
+    fallback_metadata:
+      slot_definitions: null
+label: Social
+id: block.system_menu_block.social
+provider: system
+source: block
+source_local_id: 'system_menu_block:social'
+category: Menus

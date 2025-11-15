@@ -1,0 +1,10 @@
+uuid: f63b58e1-0cb2-411e-aeeb-ca6358e7e040
+langcode: en
+status: true
+dependencies: {  }
+name: Components/Expandable
+configEntityTypeId: component
+weight: 0
+items:
+  - sdc.mercury.accordion-container
+  - sdc.mercury.collapsible-section

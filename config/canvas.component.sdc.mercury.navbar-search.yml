@@ -1,0 +1,59 @@
+uuid: f2b734ca-8765-44b5-b756-21ed960dfc58
+langcode: en
+status: true
+dependencies:
+  theme:
+    - mercury
+active_version: 86081160e789f123
+versioned_properties:
+  active:
+    settings:
+      prop_field_definitions:
+        action:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: /search/node
+          expression: ℹ︎string␟value
+        buttonLabel:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: Search
+          expression: ℹ︎string␟value
+        label:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: Search
+          expression: ℹ︎string␟value
+        method:
+          required: false
+          field_type: string
+          field_storage_settings: {  }
+          field_instance_settings: {  }
+          field_widget: string_textfield
+          default_value:
+            -
+              value: get
+          expression: ℹ︎string␟value
+    fallback_metadata:
+      slot_definitions: {  }
+label: 'Search Block'
+id: sdc.mercury.navbar-search
+provider: mercury
+source: sdc
+source_local_id: 'mercury:navbar-search'
+category: UI
