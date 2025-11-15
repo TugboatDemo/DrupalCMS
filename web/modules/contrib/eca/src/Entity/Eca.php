@@ -196,7 +196,7 @@ class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterfac
   protected function isValidationDisabled(): bool {
     $request = $this->request();
     // @noinspection StrContainsCanBeUsedInspection
-    $isAjax = mb_strpos($request->get(MainContentViewSubscriber::WRAPPER_FORMAT, ''), 'drupal_ajax') !== FALSE;
+    $isAjax = mb_strpos($request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT, ''), 'drupal_ajax') !== FALSE;
     if ($isAjax && ($referer = $request->headers->get('referer')) && $query = parse_url($referer, PHP_URL_QUERY)) {
       // @noinspection StrContainsCanBeUsedInspection
       return mb_strpos($query, 'eca_validation=off') !== FALSE;

@@ -6,7 +6,7 @@ package: Modeler API
 dependencies:
   - modeler_api:modeler_api
 
-# Information added by Drupal.org packaging script on 2025-10-14
-version: '3.0.1'
+# Information added by Drupal.org packaging script on 2025-10-24
+version: '3.0.2'
 project: 'bpmn_io'
-datestamp: 1760431529
+datestamp: 1761319423

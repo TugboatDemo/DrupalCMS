@@ -3,11 +3,14 @@ title: "{{ label|raw }}"
 tags:
 - {{ type }}
 - {{ provider }}
-- {% if extension_info.standalone %}{{ provider }}{% else %}{{ extension_info.module }}{% endif %} {{ type }} {{ version_introduced }}
+- {% if extension_info.standalone %}{{ provider }}{% else %}{{ extension_info.module }}{% endif %} {{ type }}{% if version_introduced != 'unknown' %} {{ version_introduced }}{% endif %}
+
 ---
 # {{ label|raw }}
+{% if version_introduced != 'unknown' %}
 
 Available since: {{ version_introduced }}
+{% endif %}
 
 {{ description|raw }}
 {% if tokens %}

@@ -9,9 +9,19 @@ template: false
 archive: false
 id: newsletter_signup
 title: 'Newsletter Signup'
-description: '<p>A small form to sign up for our newsletter.</p>'
+description: '<p>A form to collect email addresses for newsletter subscriptions.</p>'
 categories: {  }
-elements: "markup:\n  '#type': webform_markup\n  '#markup': '<p>Be the first to know about our latest updates, exclusive offers, and more.</p>'\nsign_up:\n  '#type': fieldset\n  '#title': 'Sign up'\n  '#title_display': invisible\n  email:\n    '#type': email\n    '#title': Email\n    '#title_display': invisible\n    '#placeholder': email\n    '#required': true\n  actions:\n    '#type': webform_actions\n    '#title': 'Submit button(s)'\n    '#submit__label': Join"
+elements: |-
+  email:
+    '#type': email
+    '#title': Email
+    '#title_display': invisible
+    '#placeholder': email
+    '#required': true
+  actions:
+    '#type': webform_actions
+    '#title': 'Submit button(s)'
+    '#submit__label': Join
 css: ''
 javascript: ''
 settings:

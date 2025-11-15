@@ -162,6 +162,11 @@ class Build extends RenderElementActionBase {
         $build = $dto_array;
         return;
       }
+      $build = [
+        '#type' => 'markup',
+        '#markup' => Markup::create($value->getString()),
+      ];
+      return;
     }
 
     if (is_array($value)) {

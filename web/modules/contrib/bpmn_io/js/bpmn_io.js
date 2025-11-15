@@ -422,6 +422,11 @@
         value = value === true || value === 'yes' || value === 'true';
         break;
 
+      case 'storage':
+        name = 'extensionElements';
+        value = Drupal.bpmn_io.setExtensionValue(element, 'Storage', value);
+        break;
+
       case 'documentation':
         value = [ Drupal.bpmn_io.modeler.get('bpmnFactory').create('bpmn:Documentation', {text: value}) ];
         break;
@@ -449,6 +454,7 @@
       config.version = element.di.bpmnElement.versionTag;
       config.model_id = element.di.bpmnElement.id;
       config.executable = element.di.bpmnElement.isExecutable;
+      config.storage = Drupal.bpmn_io.findExtensionValue(element, 'Storage');
       config.documentation = element.di.bpmnElement.documentation[0]?.text ?? '';
       config.tags = Drupal.bpmn_io.findExtensionValue(element, 'Tags');
       config.changelog = Drupal.bpmn_io.findExtensionValue(element, 'Changelog');

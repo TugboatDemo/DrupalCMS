@@ -52,6 +52,10 @@ default:
           jsonSchema:
             type: object
             properties:
+              alt:
+                type: string
+              height:
+                type: integer
               src:
                 type: string
                 contentMediaType: 'image/*'
@@ -59,11 +63,7 @@ default:
                 x-allowed-schemes:
                   - http
                   - https
-              alt:
-                type: string
               width:
-                type: integer
-              height:
                 type: integer
             required:
               - src

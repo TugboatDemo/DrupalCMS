@@ -19,7 +19,7 @@ class BuildTest extends RenderActionsTestBase {
    *
    * Merge without name.
    */
-  public function testMerge(): void {
+  public function testMergePlain(): void {
     /** @var \Drupal\eca_render\Plugin\Action\Build $action */
     $action = $this->actionManager->createInstance('eca_render_build', [
       'value' => '[build]',

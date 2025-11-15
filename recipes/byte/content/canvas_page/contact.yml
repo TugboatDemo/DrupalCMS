@@ -58,13 +58,25 @@ default:
       component_id: sdc.mercury.group
       inputs:
         flex_direction: column
-        flex_gap: none
+        flex_gap: md
         flex_align: start
         radius: none
         padding: none
         background: 'hg:bg-none'
     -
       parent_uuid: 9e717e40-1082-41cb-8b69-23bc2d028a2c
+      slot: group_slot
+      uuid: d72c2006-688d-434f-848b-6d1c540136fa
+      component_id: sdc.mercury.group
+      inputs:
+        flex_direction: column
+        flex_gap: sm
+        flex_align: center
+        radius: none
+        padding: none
+        background: 'hg:bg-none'
+    -
+      parent_uuid: d72c2006-688d-434f-848b-6d1c540136fa
       slot: group_slot
       uuid: 52aebe53-4920-4fd9-913b-8d7d8db279b6
       component_id: sdc.mercury.heading
@@ -75,17 +87,30 @@ default:
         font_color: text-inherit
         align: left
     -
-      parent_uuid: 9e717e40-1082-41cb-8b69-23bc2d028a2c
+      parent_uuid: d72c2006-688d-434f-848b-6d1c540136fa
       slot: group_slot
       uuid: 9bf34e57-4396-449c-8e10-40b8f6df04a7
       component_id: sdc.mercury.text
       inputs:
         text:
           value: '<p>Have a question? Want to schedule a demo? Tell us a bit about yourself, and we’ll get in touch as soon as we can.</p>'
+          format: canvas_html_block
         font_size_multiplier: normal
         font_color: text-inherit
     -
       parent_uuid: 9e717e40-1082-41cb-8b69-23bc2d028a2c
+      slot: group_slot
+      uuid: a7b582af-6c1a-4b60-aed9-f48a3f50a856
+      component_id: sdc.mercury.group
+      inputs:
+        flex_direction: column
+        flex_gap: sm
+        flex_align: start
+        radius: none
+        padding: none
+        background: 'hg:bg-none'
+    -
+      parent_uuid: a7b582af-6c1a-4b60-aed9-f48a3f50a856
       slot: group_slot
       uuid: bab2b882-e545-4c5a-9506-b4bcd28be7ca
       component_id: sdc.mercury.heading
@@ -96,7 +121,7 @@ default:
         font_color: text-inherit
         align: left
     -
-      parent_uuid: 9e717e40-1082-41cb-8b69-23bc2d028a2c
+      parent_uuid: a7b582af-6c1a-4b60-aed9-f48a3f50a856
       slot: group_slot
       uuid: ce875550-07c1-4f33-995b-5095a63cc625
       component_id: block.system_menu_block.social
@@ -134,9 +159,6 @@ default:
     -
       alias: /contact
       langcode: en
-  created:
-    -
-      value: 1735191284
   revision_translation_affected:
     -
       value: true

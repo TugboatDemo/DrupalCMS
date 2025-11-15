@@ -151,6 +151,9 @@ action.configuration.eca_warning_message:
       label: 'Message'
       constraints:
         NotBlank: []
+    replace_tokens:
+      type: boolean
+      label: 'Replace tokens'
 
 action.configuration.eca_error_message:
   type: mapping
@@ -161,6 +164,9 @@ action.configuration.eca_error_message:
       label: 'Message'
       constraints:
         NotBlank: []
+    replace_tokens:
+      type: boolean
+      label: 'Replace tokens'
 
 action.configuration.eca_keyvalueexpirablestore_delete:
   type: mapping

@@ -483,6 +483,13 @@ class BpmnIo extends ModelerBase {
   /**
    * {@inheritdoc}
    */
+  public function getStorage(): string {
+    return $this->parser()->getStorage();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getDocumentation(): string {
     return $this->parser()->getDocumentation();
   }

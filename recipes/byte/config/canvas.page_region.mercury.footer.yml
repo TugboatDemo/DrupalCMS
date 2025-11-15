@@ -8,9 +8,11 @@ dependencies:
     - canvas.component.block.system_menu_block.utility
     - canvas.component.block.webform_block
     - canvas.component.sdc.mercury.footer
+    - canvas.component.sdc.mercury.heading
     - canvas.component.sdc.mercury.text
     - filter.format.canvas_html_block
   module:
+    - options
     - text
   theme:
     - mercury
@@ -18,79 +20,64 @@ id: mercury.footer
 region: footer
 theme: mercury
 component_tree:
-  -
+  0:
     uuid: b4ea9fb2-d3fc-428a-9114-bce92069cbab
     component_id: sdc.mercury.footer
     component_version: d696cea1796b650e
-    inputs:
-      align: true
-  -
+    inputs: '{"align":true}'
+  '0:footer_first:0':
     parent_uuid: b4ea9fb2-d3fc-428a-9114-bce92069cbab
     slot: footer_first
     uuid: cc01f585-46ec-48a4-90b6-570277d1f370
     component_id: block.system_branding_block
     component_version: 247a23298360adb2
-    inputs:
-      label: 'Site branding'
-      label_display: '0'
-      use_site_logo: true
-      use_site_name: false
-      use_site_slogan: false
-  -
+    inputs: '{"label":"Site branding","label_display":"0","use_site_logo":true,"use_site_name":false,"use_site_slogan":false}'
+  '0:footer_first:1':
     parent_uuid: b4ea9fb2-d3fc-428a-9114-bce92069cbab
     slot: footer_first
     uuid: fdcf2eb9-c422-4a13-8467-0407d8c2f127
     component_id: block.system_menu_block.utility
     component_version: 78f97c64933451c0
-    inputs:
-      label: Utility
-      label_display: '0'
-      level: 1
-      depth: null
-      expand_all_items: false
-  -
+    inputs: '{"label":"Utility","label_display":"0","level":1,"depth":null,"expand_all_items":false}'
+  '0:footer_first:2':
     parent_uuid: b4ea9fb2-d3fc-428a-9114-bce92069cbab
     slot: footer_first
     uuid: 23ee7d03-7227-4558-a489-619b59be07e0
     component_id: block.system_menu_block.social
     component_version: 2b669e6cee911c12
-    inputs:
-      label: Social
-      label_display: '0'
-      level: 1
-      depth: null
-      expand_all_items: false
-  -
+    inputs: '{"label":"Social","label_display":"0","level":1,"depth":null,"expand_all_items":false}'
+  '0:footer_last:0':
+    parent_uuid: b4ea9fb2-d3fc-428a-9114-bce92069cbab
+    slot: footer_last
+    uuid: 4bffe49a-041a-4120-bed4-3670026e2041
+    component_id: sdc.mercury.heading
+    component_version: 1e8b34246a88c8ca
+    inputs: '{"heading_text":"Stay up to date","font_color":"text-inherit","align":"left","font_size":"heading-responsive-2xl","level":2}'
+  '0:footer_last:1':
+    parent_uuid: b4ea9fb2-d3fc-428a-9114-bce92069cbab
+    slot: footer_last
+    uuid: 33b0c50f-4431-4684-9128-ae760159ef36
+    component_id: sdc.mercury.text
+    component_version: e6b639a22eda306d
+    inputs: '{"text":{"value":"\u003Cp\u003ESubscribe to our newsletter to be the first to know about our latest updates, exclusive offers, and more.\u003C\/p\u003E","format":"canvas_html_block"},"font_size_multiplier":"text-scale-87","font_color":"text-inherit"}'
+  '0:footer_last:2':
     parent_uuid: b4ea9fb2-d3fc-428a-9114-bce92069cbab
     slot: footer_last
     uuid: 589290f2-3816-47c2-b5cf-44dbe05156ab
     component_id: block.webform_block
     component_version: 300e9b7cdec0fec0
-    inputs:
-      label: Webform
-      label_display: '0'
-      webform_id: newsletter_signup
-      default_data: ''
-      redirect: false
-      lazy: false
-  -
+    inputs: '{"label":"Webform","label_display":"0","webform_id":"newsletter_signup","default_data":"","redirect":false,"lazy":false}'
+  '0:footer_utility_first:0':
     parent_uuid: b4ea9fb2-d3fc-428a-9114-bce92069cbab
     slot: footer_utility_first
     uuid: 4208772f-dd0d-4588-8ce2-8509ba22aadc
     component_id: block.system_menu_block.footer
     component_version: edacf59ecca4a7cd
-    inputs:
-      label: Footer
-      label_display: '0'
-      level: 1
-      depth: null
-      expand_all_items: false
-  -
+    inputs: '{"label":"Footer","label_display":"0","level":1,"depth":null,"expand_all_items":false}'
+  '0:footer_utility_last:0':
     parent_uuid: b4ea9fb2-d3fc-428a-9114-bce92069cbab
     slot: footer_utility_last
     uuid: a606580b-bd8b-4576-b89e-b9f97ef72d91
     component_id: sdc.mercury.text
     component_version: e6b639a22eda306d
-    inputs:
-      text:
-        value: '<p>© Copyright 2025</p>'
+    inputs: '{"text":{"value":"\u003Cp\u003E\u00a9 Copyright 2025\u003C\/p\u003E","format":"canvas_html_block"}}'

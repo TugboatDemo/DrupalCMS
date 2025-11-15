@@ -163,6 +163,18 @@ class Parser {
   }
 
   /**
+   * Gets the storage setting of the model.
+   *
+   * @return string
+   *   The storage setting.
+   */
+  public function getStorage(): string {
+    $process = $this->xmlNsPrefix() . 'process';
+    $extensions = $this->xmlNsPrefix() . 'extensionElements';
+    return $this->findProperty($this->xmlModel[$process][0][$extensions] ?? [], 'Storage');
+  }
+
+  /**
    * Gets the documentation of the model.
    *
    * @return string

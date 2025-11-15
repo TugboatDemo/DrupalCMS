@@ -144,6 +144,12 @@ class FormHooks {
       return;
     }
 
+    // Skip if subform is null or not an array
+    // to prevent InlineEntityFormBuild errors.
+    if (!isset($element['subform']) || !is_array($element['subform'])) {
+      return;
+    }
+
     $field_name = $context['items']->getFieldDefinition()->getName();
     $delta = $context['delta'];
     $widget_state = WidgetBase::getWidgetState($element['#field_parents'], $field_name, $form_state);
