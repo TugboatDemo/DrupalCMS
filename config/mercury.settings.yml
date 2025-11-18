@@ -1,4 +1,4 @@
 logo:
   path: 'public://byte-logo.svg'
   use_default: false
-scheme: byte-dark
+scheme: vanilla-dark
