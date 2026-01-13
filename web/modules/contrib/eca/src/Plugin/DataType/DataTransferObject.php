@@ -13,6 +13,8 @@ use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\Attribute\DataType;
 use Drupal\Core\TypedData\ComplexDataInterface;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\Plugin\DataType\Map;
@@ -28,14 +30,13 @@ use Drupal\eca\TypedData\DataTransferObjectDefinition;
  * A Data Transfer Object (DTO) allows attachment of arbitrary properties.
  * A DTO can also be used as a list: items may be dynamically added by using '+'
  * and removed by using '-'. Example: $dto->set('+', $value).
- *
- * @DataType(
- *   id = "dto",
- *   label = @Translation("Data Transfer Object"),
- *   description = @Translation("Data Transfer Objects (DTOs) which may contain arbitrary and user-defined properties of data."),
- *   definition_class = "\Drupal\eca\TypedData\DataTransferObjectDefinition"
- * )
  */
+#[DataType(
+  id: 'dto',
+  label: new TranslatableMarkup('Data Transfer Object'),
+  description: new TranslatableMarkup('Data Transfer Objects (DTOs) which may contain arbitrary and user-defined properties of data.'),
+  definition_class: DataTransferObjectDefinition::class
+)]
 class DataTransferObject extends Map {
 
   /**

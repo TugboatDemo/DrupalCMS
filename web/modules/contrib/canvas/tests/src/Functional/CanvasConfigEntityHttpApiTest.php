@@ -135,6 +135,7 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
       'type' => 'component',
       'weight' => 0,
       'items' => [
+        'sdc.canvas_test_sdc.date',
         'sdc.canvas_test_sdc.heading',
         'sdc.canvas_test_sdc.shoe_badge',
       ],
@@ -172,6 +173,7 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
         'sdc.canvas_broken_sdcs.invalid-filter',
         'sdc.canvas_broken_sdcs.malformed-image',
         'sdc.canvas_test_sdc.my-cta',
+        'sdc.canvas_test_sdc.component-mismatch-meta-enum',
         'sdc.canvas_test_sdc.component-no-meta-enum',
         'sdc.canvas_test_sdc.banner',
         'sdc.canvas_test_sdc.card',
@@ -193,6 +195,7 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
         'sdc.canvas_test_sdc.card-with-remote-image',
         'sdc.canvas_test_sdc.image-gallery',
         'sdc.canvas_test_sdc.druplicon',
+        'sdc.canvas_test_sdc.image-without-ref',
       ],
     ],
     'd0ba87b2-79b4-4622-98e1-cf82dc3655a0' => [
@@ -651,6 +654,35 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
   }
 
   /**
+   * Asserts the presence of a preview for a code component.
+   *
+   * Details of the preview are tested elsewhere.
+   *
+   * @see \Drupal\Tests\canvas\Kernel\Plugin\Canvas\ComponentSource\JsComponentTest::testRenderJsComponent()
+   * @see \Drupal\Tests\canvas\Kernel\Plugin\Canvas\ComponentSource\JsComponentTest::getExpectedClientSideInfos()
+   */
+  private static function assertPreviewForJavaScriptComponentIsPresentThenOmit(array $json, string $code_component_id, array $path_to_subset): array {
+    $relevant_subset = NestedArray::getValue($json, $path_to_subset);
+    self::assertIsArray($relevant_subset);
+    self::assertArrayHasKey('default_markup', $relevant_subset);
+    self::assertArrayHasKey('css', $relevant_subset);
+    self::assertArrayHasKey('js_header', $relevant_subset);
+    self::assertArrayHasKey('js_footer', $relevant_subset);
+    self::assertStringContainsString("/canvas/api/v0/auto-saves/js/js_component/$code_component_id", $relevant_subset['default_markup']);
+    self::assertStringContainsString("/canvas/api/v0/auto-saves/css/js_component/$code_component_id", $relevant_subset['css']);
+    self::assertStringContainsString('<script type="application/json" data-drupal-selector="drupal-settings-json">', $relevant_subset['js_header']);
+    self::assertStringContainsString('/canvas/api/v0/auto-saves/js/asset_library/global', $relevant_subset['js_footer']);
+    unset(
+      $relevant_subset['default_markup'],
+      $relevant_subset['css'],
+      $relevant_subset['js_header'],
+      $relevant_subset['js_footer'],
+    );
+    NestedArray::setValue($json, $path_to_subset, $relevant_subset);
+    return $json;
+  }
+
+  /**
    * @see \Drupal\canvas\Entity\JavaScriptComponent
    */
   public function testJavaScriptComponent(): void {
@@ -700,20 +732,20 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
       'links' => [
         'delete-form' => \base_path() . 'canvas/api/v0/config/js_component/disabled_js_component',
       ],
-      'default_markup' => '@todo Make something 🆒 in https://www.drupal.org/project/canvas/issues/3498889',
-      'css' => '',
-      'js_header' => '',
-      'js_footer' => '',
     ];
 
     // The list response MUST contain unpublished Code Components.
-    $body = $this->assertExpectedResponse('GET', $list_url, [], 200, ['languages:language_interface', 'theme', 'user.permissions'], ['config:js_component_list', 'http_response'], 'UNCACHEABLE (request policy)', 'MISS');
+    $body = $this->assertExpectedResponse('GET', $list_url, [], 200, ['languages:language_interface', 'theme', 'user.permissions'], [AutoSaveManager::CACHE_TAG, 'config:js_component_list', 'http_response'], 'UNCACHEABLE (request policy)', 'MISS');
+    self::assertIsArray($body);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body, 'disabled_js_component', ['disabled_js_component']);
     $this->assertSame([
       'disabled_js_component' => $expected_disabled_js_component_normalization,
-    ], $body);
+    ], $body_without_preview);
     $canonical_url = Url::fromUri('base:/canvas/api/v0/config/js_component/disabled_js_component');
-    $body = $this->assertExpectedResponse('GET', $canonical_url, [], 200, ['languages:language_interface', 'theme', 'user.permissions'], ['config:canvas.js_component.disabled_js_component', 'http_response'], 'UNCACHEABLE (request policy)', 'MISS');
-    $this->assertSame($expected_disabled_js_component_normalization, $body);
+    $body = $this->assertExpectedResponse('GET', $canonical_url, [], 200, ['languages:language_interface', 'theme', 'user.permissions'], [AutoSaveManager::CACHE_TAG, 'config:canvas.js_component.disabled_js_component', 'http_response'], 'UNCACHEABLE (request policy)', 'MISS');
+    self::assertIsArray($body);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body, 'disabled_js_component', []);
+    $this->assertSame($expected_disabled_js_component_normalization, $body_without_preview);
     $jsComponent->delete();
 
     // Create a Code Component via the Canvas HTTP API, but forget crucial data: 500, courtesy of OpenAPI.
@@ -883,10 +915,6 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
         // 💡The ABSENCE of a `delete-form` link here is because this code
         // component is a dependency of the other.
       ],
-      'default_markup' => '@todo Make something 🆒 in https://www.drupal.org/project/canvas/issues/3498889',
-      'css' => '',
-      'js_header' => '',
-      'js_footer' => '',
     ]);
 
     // Create a Code Component via the Canvas HTTP API, correctly: 201.
@@ -1015,12 +1043,10 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
       'links' => [
         'delete-form' => \base_path() . 'canvas/api/v0/config/js_component/test',
       ],
-      'default_markup' => '@todo Make something 🆒 in https://www.drupal.org/project/canvas/issues/3498889',
-      'css' => '',
-      'js_header' => '',
-      'js_footer' => '',
     ];
-    $this->assertSame($expected_component, $body);
+    self::assertIsArray($body);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body, 'test', []);
+    $this->assertSame($expected_component, $body_without_preview);
     // Confirm that the code components ARE NOT exposed.
     // @see docs/config-management.md#3.2.1
     $this->assertExposedCodeComponents([], 'MISS', $request_options);
@@ -1040,8 +1066,10 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
 
     // Admin should be able to get the Code Component from the Canvas HTTP API.
     $canonical_url = Url::fromUri('base:/canvas/api/v0/config/js_component/test');
-    $body = $this->assertExpectedResponse('GET', $canonical_url, [], 200, ['languages:language_interface', 'theme', 'user.permissions'], ['config:canvas.js_component.another_component', 'config:canvas.js_component.test', 'http_response'], 'UNCACHEABLE (request policy)', 'MISS');
-    $this->assertSame($expected_component, $body);
+    $body = $this->assertExpectedResponse('GET', $canonical_url, [], 200, ['languages:language_interface', 'theme', 'user.permissions'], [AutoSaveManager::CACHE_TAG, 'config:canvas.js_component.another_component', 'config:canvas.js_component.test', 'http_response'], 'UNCACHEABLE (request policy)', 'MISS');
+    self::assertIsArray($body);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body, 'test', []);
+    $this->assertSame($expected_component, $body_without_preview);
 
     // Editing the previous JavaScriptComponent to PATCH `meta:enum`,
     // which should be allowed.
@@ -1053,13 +1081,15 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
       ],
     ]);
     $body = $this->assertExpectedResponse('PATCH', Url::fromUri('base:/canvas/api/v0/config/js_component/test'), $request_options, 200, NULL, NULL, NULL, NULL);
+    self::assertIsArray($body);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body, 'test', []);
     $this->assertSame(NestedArray::mergeDeep($expected_component, [
       'props' => [
         'enum' => [
           'meta:enum' => ['primary' => 'Primary Value', 'secondary' => 'Secondary Value'],
         ],
       ],
-    ]), $body);
+    ]), $body_without_preview);
 
     // Modify a JavaScriptComponent incorrectly (shape-wise): 500.
     $request_options[RequestOptions::JSON] = [
@@ -1131,7 +1161,9 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
     $code_component_to_send['sourceCodeJs'] = 'console.log("Test")';
     $request_options[RequestOptions::JSON] = $code_component_to_send;
     $body = $this->assertExpectedResponse('PATCH', Url::fromUri('base:/canvas/api/v0/config/js_component/test'), $request_options, 200, NULL, NULL, NULL, NULL);
-    $this->assertSame($expected_component, $body);
+    self::assertIsArray($body);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body, 'test', []);
+    $this->assertSame($expected_component, $body_without_preview);
 
     // Partially modify a Code Component: 200
     $code_component_to_send['name'] = 'Test once again for good luck';
@@ -1140,7 +1172,9 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
       'name' => $code_component_to_send['name'],
     ];
     $body = $this->assertExpectedResponse('PATCH', Url::fromUri('base:/canvas/api/v0/config/js_component/test'), $request_options, 200, NULL, NULL, NULL, NULL);
-    $this->assertSame($expected_component, $body);
+    self::assertIsArray($body);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body, 'test', []);
+    $this->assertSame($expected_component, $body_without_preview);
 
     // Re-retrieve list: 200, non-empty list, despite `status` of entity being
     // `false`. Dynamic Page Cache miss.
@@ -1149,18 +1183,22 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
       'theme',
       'user.permissions',
     ], [
+      AutoSaveManager::CACHE_TAG,
       'config:js_component_list',
       'http_response',
     ], 'UNCACHEABLE (request policy)', 'MISS');
     // Ensure the order matches.
     \assert(\is_array($body));
     \ksort($body);
+    $body_without_preview = $body;
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body_without_preview, 'another_component', ['another_component']);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body_without_preview, 'test', ['test']);
     $this->assertSame(
       [
         'another_component' => $expected_dependency_component,
         'test' => $expected_component,
       ],
-      $body
+      $body_without_preview
     );
     // Confirm that the code component IS STILL NOT exposed, because `status` is
     // still `FALSE`.
@@ -1199,7 +1237,6 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
         'secondary' => 'Secondary',
       ],
     ];
-    unset($expected_auto_save['css'], $expected_auto_save['default_markup'], $expected_auto_save['js_footer'], $expected_auto_save['js_header']);
     $this->performAutoSave($auto_save_data, $expected_auto_save, JavaScriptComponent::ENTITY_TYPE_ID, 'test');
 
     // Modify a Code Component correctly: 200.
@@ -1211,7 +1248,9 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
     $expected_component['status'] = TRUE;
     $request_options[RequestOptions::JSON] = $code_component_to_send;
     $body = $this->assertExpectedResponse('PATCH', Url::fromUri('base:/canvas/api/v0/config/js_component/test'), $request_options, 200, NULL, NULL, NULL, NULL);
-    $this->assertSame($expected_component, $body);
+    self::assertIsArray($body);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body, 'test', []);
+    $this->assertSame($expected_component, $body_without_preview);
     // Confirm that the code component IS exposed, because `status` was just
     // changed to `TRUE`.
     // @see docs/config-management.md#3.2.1
@@ -1241,7 +1280,9 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
     $expected_component['status'] = FALSE;
     $request_options[RequestOptions::JSON] = $code_component_to_send;
     $body = $this->assertExpectedResponse('PATCH', Url::fromUri('base:/canvas/api/v0/config/js_component/test'), $request_options, 200, NULL, NULL, NULL, NULL);
-    $this->assertSame($expected_component, $body);
+    self::assertIsArray($body);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body, 'test', []);
+    $this->assertSame($expected_component, $body_without_preview);
     // Confirm that the code component still IS exposed (a Component config
     // entity still exists), but is disabled aka not available to be placed (the
     // Component config entity's `status` was just changed to `FALSE`).
@@ -1256,13 +1297,18 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
       'theme',
       'user.permissions',
     ], [
+      AutoSaveManager::CACHE_TAG,
       'config:js_component_list',
       'http_response',
     ], 'UNCACHEABLE (request policy)', 'MISS');
+    self::assertIsArray($body);
+    $body_without_preview = $body;
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body_without_preview, 'another_component', ['another_component']);
+    $body_without_preview = self::assertPreviewForJavaScriptComponentIsPresentThenOmit($body_without_preview, 'test', ['test']);
     $this->assertSame([
       'another_component' => $expected_dependency_component,
       'test' => $expected_component,
-    ], $body);
+    ], $body_without_preview);
 
     // Create a new auto-save entry.
     $auto_save_data = $code_component_to_send;
@@ -1294,7 +1340,6 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
         'secondary' => 'Secondary',
       ],
     ];
-    unset($expected_auto_save['css'], $expected_auto_save['default_markup'], $expected_auto_save['js_footer'], $expected_auto_save['js_header']);
     $this->performAutoSave($auto_save_data, $expected_auto_save, JavaScriptComponent::ENTITY_TYPE_ID, 'test');
 
     $page = Page::create([
@@ -1599,6 +1644,8 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
       'config:system.site',
       'config:system.theme',
       'http_response',
+      // @see \Drupal\canvas\Plugin\Canvas\ComponentSource\SingleDirectoryComponent::rewriteExampleUrl()
+      'component_plugins',
     ];
     // If expected adds new components, those components add additional cache tags. If those cache tags are not
     // present, the test will fail. This array is used to add those additional expected cache tags.
@@ -1614,6 +1661,17 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
 
   public function testComponent(): void {
     $this->container->get('theme_installer')->install(['stark', 'test_theme_child']);
+    // TRICKY: On an actual site, the theme installer would trigger
+    // `hook_rebuild()`, but we cannot do that in `hook_themes_installed()`, as
+    // Stark is installed early in tests, which results in Components being
+    // created that rely on non-existent config (image styles, etc).
+    // Alternatively, if Canvas' default config is first installed, installing
+    // its Editor config entities triggers Ckeditor5Hooks::libraryInfoAlter(),
+    // which calls \_ckeditor5_theme_css() and then complains the default theme
+    // (`stark`) is not installed.
+    // @see \_ckeditor5_theme_css()
+    // @see \Drupal\Core\Recipe\RecipeConfigInstaller::installRecipeConfig()
+    $this->generateComponentConfig();
 
     // Ensure we have an interesting set of Component config entities: the ones
     // provided by the modules & themes, including:
@@ -1648,6 +1706,8 @@ class CanvasConfigEntityHttpApiTest extends HttpApiTestBase {
       'node_list',
       'user_list',
       AutoSaveManager::CACHE_TAG,
+      // @see \Drupal\canvas\Plugin\Canvas\ComponentSource\SingleDirectoryComponent::rewriteExampleUrl()
+      'component_plugins',
     ];
 
     $expected_contexts = [

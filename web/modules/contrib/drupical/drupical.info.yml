@@ -1,0 +1,10 @@
+name: Drupical
+type: module
+description: Displays Drupal community events from drupal.org.
+package: Custom
+core_version_requirement: ^10 || ^11
+
+# Information added by Drupal.org packaging script on 2026-01-09
+version: '1.0.1'
+project: 'drupical'
+datestamp: 1767948906

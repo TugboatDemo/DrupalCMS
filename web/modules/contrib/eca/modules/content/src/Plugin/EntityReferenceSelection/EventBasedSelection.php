@@ -3,11 +3,13 @@
 namespace Drupal\eca_content\Plugin\EntityReferenceSelection;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginBase;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\eca_content\Event\ContentEntityEvents;
 use Drupal\eca_content\Event\ReferenceSelection;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -15,14 +17,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides event-based access control on entity reference selections.
- *
- * @EntityReferenceSelection(
- *   id = "eca",
- *   label = @Translation("Event-based selection with ECA"),
- *   group = "eca",
- *   weight = 10
- * )
  */
+#[EntityReferenceSelection(
+  id: 'eca',
+  label: new TranslatableMarkup('Event-based selection with ECA'),
+  group: 'eca',
+  weight: 10
+)]
 final class EventBasedSelection extends SelectionPluginBase implements ContainerFactoryPluginInterface {
 
   /**

@@ -6,7 +6,7 @@ core_version_requirement: ^8.8 || ^9 || ^10 || ^11
 dependencies:
   - tagify:tagify
 
-# Information added by Drupal.org packaging script on 2025-09-05
-version: '1.2.42'
+# Information added by Drupal.org packaging script on 2026-01-12
+version: '1.2.46'
 project: 'tagify'
-datestamp: 1757084236
+datestamp: 1768243048

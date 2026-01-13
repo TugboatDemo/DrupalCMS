@@ -9,7 +9,6 @@ use Drupal\canvas\ComponentSource\ComponentSourceManager;
 use Drupal\canvas\Entity\Component;
 use Drupal\canvas\Entity\ComponentInterface;
 use Drupal\canvas\Entity\ContentTemplate;
-use Drupal\canvas\Plugin\Canvas\ComponentSource\BlockComponent;
 use Drupal\canvas\Plugin\Canvas\ComponentSource\Fallback;
 use Drupal\canvas\Storage\ComponentTreeLoader;
 use Drupal\Core\Entity\EntityInterface;
@@ -81,10 +80,9 @@ final class ComponentInstanceForm extends FormBase {
       ];
     }
     $host_entity = $entity instanceof ContentTemplate ? $preview_entity : $entity;
-    $stored_tree = $this->componentTreeLoader->load($entity);
 
     $request = $this->getRequest();
-    $tree = $request->get('form_canvas_tree');
+    $tree = $request->request->getString('form_canvas_tree');
     [$component_id, $version] = \explode('@', \json_decode($tree, TRUE)['type']);
     if (empty($version)) {
       throw new \UnexpectedValueException('No component version specified.');
@@ -96,9 +94,14 @@ final class ComponentInstanceForm extends FormBase {
     // component-source specific settings, such as the field type/widget for a
     // particular SDC or code component prop.
     $component->loadVersion($version);
-    $component_instance_uuid = $request->get('form_canvas_selected');
+    if ($request->query->has('form_canvas_selected')) {
+      $component_instance_uuid = $request->query->getString('form_canvas_selected');
+    }
+    else {
+      $component_instance_uuid = $request->request->getString('form_canvas_selected');
+    }
 
-    $props = $request->get('form_canvas_props');
+    $props = $request->request->getString('form_canvas_props');
     $client_model = json_decode($props, TRUE);
 
     // Make sure these get sent in subsequent AJAX requests.
@@ -131,24 +134,29 @@ final class ComponentInstanceForm extends FormBase {
       $instance_form = $component->getComponentSource()->buildComponentInstanceForm($sub_form, $form_state, $component, $component_instance_uuid, $inputs, $entity, $component->get('settings'));
     }
     else {
-      $inputs = $client_model;
-      // For blocks, the client model is invalid, because $props is the
-      // "undefined" string.
-      // So let's get the data from the stored tree (better than nothing)
-      // @todo We require to harden this in the client-side.
-      if ($inputs === NULL && $component->getComponentSource() instanceof BlockComponent) {
-        $inputs = $stored_tree->getComponentTreeItemByUuid($component_instance_uuid)?->getInputs() ?? [];
-      }
+      $inputs_to_show = match(TRUE) {
+        // Common case.
+        is_array($client_model) && array_key_exists('resolved', $client_model) => $client_model['resolved'],
+        // For robustness.
+        // @see https://en.wikipedia.org/wiki/Robustness_principle
+        is_array($client_model) => $client_model,
+        // Worst case: fall back to stored data, if this component instance had
+        // previously been saved. If none, fall back to the empty array.
+        default => $this->componentTreeLoader->load($entity)
+          ->getComponentTreeItemByUuid($component_instance_uuid)
+          ?->getInputs() ?? [],
+      };
       $fallback_source = $this->componentSourceManager->createInstance(Fallback::PLUGIN_ID, ['fallback_reason' => $this->t('Component is missing. Fix the component or copy values to a new component.')]);
       \assert($fallback_source instanceof ComponentSourceInterface);
-      $instance_form = $fallback_source->buildComponentInstanceForm($sub_form, $form_state, $component, $component_instance_uuid, $inputs, $entity, $component->get('settings'));
+      $instance_form = $fallback_source->buildComponentInstanceForm($sub_form, $form_state, $component, $component_instance_uuid, $inputs_to_show, $entity, $component->get('settings'));
     }
 
     $form['#attributes']['data-form-id'] = self::FORM_ID;
 
     $form['canvas_component_props'][$component_instance_uuid] = $instance_form;
     $form['#pre_render'][] = [FormIdPreRender::class, 'addFormId'];
-    if ($request->get(AjaxResponseSubscriber::AJAX_REQUEST_PARAMETER) !== NULL) {
+    $is_ajax = $request->request->get(AjaxResponseSubscriber::AJAX_REQUEST_PARAMETER) ?? $request->query->get(AjaxResponseSubscriber::AJAX_REQUEST_PARAMETER);
+    if ($is_ajax !== NULL) {
       // Add the data-ajax flag and manually add the form ID as pre render
       // callbacks aren't fired during AJAX rendering because the whole form is
       // not rendered, just the returned elements.

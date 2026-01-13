@@ -1,3 +1,5 @@
+!autosave # Use "auto-save", "AutoSave", or "auto_save" instead.
+!Autosave # Use "auto-save", "AutoSave", or "auto_save" instead.
 adrs
 aiwizard
 alternatewidths
@@ -8,12 +10,18 @@ autocompleteresponse
 autocompletesearch
 autocompleteselect
 autodocs
-!autosave # Use "auto-save", "AutoSave", or "auto_save" instead.
-!Autosave # Use "auto-save", "AutoSave", or "auto_save" instead.
+balintbrews
 basepath
 biscoff
+bunx
+cacheabilities
+canvascanvas
+canvasrc
+canvasstark
 Carden
+Cdiv
 cebe
+Clurichaun
 cnvs
 cnvst # Used for "canvas tests"
 CODEOWNERS
@@ -24,6 +32,7 @@ csstree
 ddev
 debucketed
 dedreux
+Deepchat
 delaville
 devizzent
 dhta
@@ -40,14 +49,18 @@ fieldtext
 folderfy
 gerbeaud
 heredocs
+herobanner
+herobannersecond
 hyperscriptification
 hyperscriptified
 hyperscriptify
 hyperscriptifying
 ianvs
 importmap
+interactable
 inwidget
 jangregor
+Jsona
 JSONified
 jsxs
 langcode
@@ -59,24 +72,30 @@ metacharacter
 metatag
 microlink
 mymodule
+naïvely
 networkidle
+nodepath
+nodepaths
 Nygard
 Nygard's
+OPENCOLLECTIVE
 outro
 personalizable
-placehold
 phenaproxima
+placehold
 Postel
 propless
 propsify
+proptypes
 Pryce's
 pubout
 Qqtnj
 rdndmb
-redocly
 redoable
+redocly
 reduxjs
 renderify
+requiredness
 rightbar
 rightclick
 rtkq
@@ -85,6 +104,7 @@ scriptified
 scriptify
 sdcs
 semicoupled
+shadcn
 sonner
 sparkline
 Starshot
@@ -94,11 +114,11 @@ subtrigger
 supersets
 superstrongpassword
 SVAY
-tseslint
 testid
 toolset
 topbar
 tsconfigs
+tseslint
 ultrawide
 uncollapse
 uncollapsed
@@ -107,22 +127,11 @@ unlayered
 unstorable
 unstub
 unvalidatable
-uuidv
 upserting
 upserts
 useswr
+uuidv
 Validatable
 vaul
-canvasstark
-canvasrc
-canvascanvas
 xmdi
 ymls
-Deepchat
-interactable
-nodepath
-nodepaths
-proptypes
-herobanner
-herobannersecond
-Cdiv

@@ -1,0 +1,64 @@
+{#
+/**
+ * @file
+ * Theme override for status messages.
+ *
+ * Displays status, error, and warning messages, grouped by type.
+ *
+ * An invisible heading identifies the messages for assistive technology.
+ * Sighted users see a colored box. See
+ * https://www.w3.org/TR/WCAG-TECHS/H69.html for info.
+ *
+ * Add an ARIA label to the contentinfo area so that assistive technology
+ * user agents will better describe this landmark.
+ *
+ * Available variables:
+ * - message_list: List of messages to be displayed, grouped by type.
+ * - status_headings: List of all status types.
+ * - attributes: HTML attributes for the element, including:
+ *   - class: HTML classes.
+ */
+#}
+<div data-drupal-messages class="container mx-auto p-4 lg:max-w-4xl">
+  {% for type, messages in message_list %}
+    {% if type == 'status' %}
+      {% set type_class = 'bg-green-100 text-green-900' %} {% set type_icon = 'check-circle' %}
+    {% elseif type == 'info' %}
+      {% set type_class = 'bg-blue-100 text-blue-900' %} {% set type_icon = 'check-info' %}
+    {% elseif type == 'warning' %}
+      {% set type_class = 'bg-yellow-100 text-yellow-900' %} {% set type_icon = 'warning' %}
+    {% elseif type == 'error' %}
+      {% set type_class = 'bg-red-100 text-red-900' %} {% set type_icon = 'circle-x' %}
+    {% endif %}
+    <div class="message-item flex flex-row rounded-md p-4 {{ type_class }}">
+      <div class="message-header flex">
+        <div class="message-{{ type }}-icon my-auto">
+          {{
+            include(
+              '@byte_theme/components/icon/icon.twig',
+              {
+                icon: type_icon,
+                icon_size: 'medium'
+              },
+              with_context: false
+            )
+          }}
+        </div>
+        <h2 class="visually-hidden">{{ status_headings[type] }}</h2>
+      </div>
+      <div class="message-body my-2 w-full text-base xl:text-lg 2xl:text-xl [&_a]:underline [&_a]:underline-offset-2">
+        {% if (messages|length) > 1 %}
+          <ul class="flex list-none flex-col gap-2 pl-2">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="pl-2">
+            {{ messages|first }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endfor %}
+</div>

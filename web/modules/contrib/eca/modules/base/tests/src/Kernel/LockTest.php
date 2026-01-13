@@ -5,14 +5,14 @@ namespace Drupal\Tests\eca_base\Kernel;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Kernel tests for the lock mechanics of the ECA base module.
- *
- * @group eca
- * @group eca_base
  */
+#[Group('eca')]
+#[Group('eca_base')]
 class LockTest extends KernelTestBase {
 
   /**

@@ -2,9 +2,8 @@ name: Blog
 type: Drupal CMS
 description: Adds a blog post content type and listing page.
 recipes:
-  - drupal_cms_page
+  - drupal_cms_content_type_base
 install:
-  - menu_link_content
   - selective_better_exposed_filters
 config:
   strict: false

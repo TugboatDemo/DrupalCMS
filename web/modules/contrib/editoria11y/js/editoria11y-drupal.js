@@ -517,6 +517,7 @@ const ed11yInitializer = function () {
         ed11yDismissalsCache = {};
         data = {
           page_path: drupalSettings.editoria11y.page_path,
+          element_id: detail.dismissKey,
           language: drupalSettings.editoria11y.lang,
           route_name: drupalSettings.editoria11y.route_name,
           dismissal_status: 'reset', // ok, ignore or reset

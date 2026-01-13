@@ -105,3 +105,28 @@ action.configuration.eca_config_write:
     config_key:
       type: string
       label: 'Config key'
+
+action.configuration.eca_config_list:
+  type: mapping
+  label: 'Configuration for the "Config List" action'
+  mapping:
+    token_name:
+      type: string
+      label: 'Name of the token which should hold the list'
+    prefix:
+      type: string
+      label: 'An optional configuration prefix.'
+
+action.configuration.eca_config_action:
+  type: mapping
+  label: 'Configuration for the "Config Action" action'
+  mapping:
+    action_id:
+      type: string
+      label: 'Config action ID'
+    config_name:
+      type: string
+      label: 'Name of the config object or entity to run the action upon (wildcards allowed)'
+    data:
+      type: text
+      label: 'Additional data to pass to the action, in YAML format'

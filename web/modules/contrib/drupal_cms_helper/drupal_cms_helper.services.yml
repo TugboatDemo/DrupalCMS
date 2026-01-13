@@ -1,9 +1,13 @@
 services:
   _defaults:
-    autowire: true
     autoconfigure: true
-  Drupal\drupal_cms_helper\EventSubscriber\RecipeSubscriber: ~
+    autowire: true
   Drupal\drupal_cms_helper\SiteExporter:
     arguments:
       $storage: '@config.storage'
-      $contentExporter: '@?Drupal\Core\DefaultContent\Exporter'
+  # These event subscribers are internal and may be changed, or removed,
+  # at any time without warning. External code should not touch them.
+  Drupal\drupal_cms_helper\EventSubscriber\DefaultContentSubscriber: ~
+  Drupal\drupal_cms_helper\EventSubscriber\RecipeSubscriber: ~
+  Drupal\drupal_cms_helper\EventSubscriber\RouteSubscriber: ~
+  Drupal\drupal_cms_helper\EventSubscriber\AccessDeniedSubscriber: ~

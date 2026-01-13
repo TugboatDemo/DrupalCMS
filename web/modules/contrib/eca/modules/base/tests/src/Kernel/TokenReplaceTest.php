@@ -4,13 +4,13 @@ namespace Drupal\Tests\eca_base\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests for the "eca_token_replace" action plugin.
- *
- * @group eca
- * @group eca_base
  */
+#[Group('eca')]
+#[Group('eca_base')]
 class TokenReplaceTest extends KernelTestBase {
 
   /**

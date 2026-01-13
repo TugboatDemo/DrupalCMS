@@ -21,6 +21,9 @@ class RedirectTrashHandler extends DefaultTrashHandler {
   #[Hook('redirect_presave')]
   public function preSave(EntityInterface $entity): void {
     assert($entity instanceof Redirect);
+    if (!$this->trashManager->isEntityTypeEnabled($entity->getEntityTypeId())) {
+      return;
+    }
 
     // Set a random hash value for deleted redirects in order to allow new ones
     // to be created with the same source URL.

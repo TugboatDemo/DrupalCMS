@@ -15,6 +15,7 @@ use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\eca\ContentTypeCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,10 +27,9 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Execution chain tests using plugins of eca_content.
- *
- * @group eca
- * @group eca_content
  */
+#[Group('eca')]
+#[Group('eca_content')]
 class ContentExecutionChainTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;

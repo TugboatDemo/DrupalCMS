@@ -20,10 +20,10 @@ default:
       alias: null
   field_media_image:
     -
-      alt: 'A silhouette of a person against a blue and pink background.'
+      alt: 'A man sitting on the ground working on a laptop with others around him doing the same.'
       title: ''
-      width: 454
-      height: 340
+      width: 1200
+      height: 802
       entity: 34c8d2b7-ce58-4ea5-b367-4fb9587010be
 _meta:
   version: '1.0'

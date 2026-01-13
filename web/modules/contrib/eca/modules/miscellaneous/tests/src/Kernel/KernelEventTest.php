@@ -7,6 +7,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\eca\Entity\Eca;
 use Drupal\eca_test_array\Plugin\Action\ArrayIncrement;
 use Drupal\eca_test_array\Plugin\Action\ArrayWrite;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
@@ -24,10 +25,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Kernel event tests provided by "eca_misc".
- *
- * @group eca
- * @group eca_misc
  */
+#[Group('eca')]
+#[Group('eca_misc')]
 class KernelEventTest extends KernelTestBase {
 
   /**

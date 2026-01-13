@@ -91,8 +91,6 @@ class EntityRestoreForm extends ContentEntityConfirmFormBase implements Workspac
       return;
     }
 
-    // Ensure that the redirect URL doesn't have any Trash context.
-    $this->getRequest()->query->remove('in_trash');
     $form_state->setRedirectUrl($this->getRedirectUrl());
 
     $this->messenger()->addStatus($this->t('The @entity-type %label has been restored from trash.', $args));

@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\tagify\Plugin\better_exposed_filters\filter;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\better_exposed_filters\Plugin\better_exposed_filters\filter\FilterWidgetBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -16,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   label = @Translation("Tagify"),
  * )
  */
-class Tagify extends FilterWidgetBase implements ContainerFactoryPluginInterface {
+class Tagify extends FilterWidgetBase {
 
   /**
    * The entity_autocomplete key value store.
@@ -28,11 +29,29 @@ class Tagify extends FilterWidgetBase implements ContainerFactoryPluginInterface
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    $instance = new static($configuration, $plugin_id, $plugin_definition);
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    $request = $container->get('request_stack')->getCurrentRequest();
+    $configFactory = $container->get('config.factory');
+    $instance = new static($configuration, $plugin_id, $plugin_definition, $request, $configFactory);
     $instance->keyValue = $container->get('keyvalue')->get('entity_autocomplete');
 
     return $instance;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function isApplicable(mixed $filter = NULL, array $filter_options = []): bool {
+    if (is_a($filter, 'Drupal\taxonomy\Plugin\views\filter\TaxonomyIndexTid')) {
+      // Autocomplete and dropdown taxonomy filter are both instances of
+      // TaxonomyIndexTid, but we can't show BEF options for the select
+      // widget.
+      if ($filter_options['type'] == 'select') {
+        return FALSE;
+      }
+    }
+
+    return parent::isApplicable($filter, $filter_options);
   }
 
   /**
@@ -55,6 +74,11 @@ class Tagify extends FilterWidgetBase implements ContainerFactoryPluginInterface
 
     $field_id = $this->getExposedFilterFieldId();
     if (!isset($form[$field_id])) {
+      return;
+    }
+
+    // Fail gracefully if the required properties ar not set.
+    if (!isset($form[$field_id]['#target_type']) || !isset($form[$field_id]['#tags'])) {
       return;
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\trash\Kernel;
 
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -93,6 +95,85 @@ class TrashKernelTest extends TrashKernelTestBase {
     $this->assertSame($enabled, $this->getTrashManager()->isEntityTypeEnabled($entity_type_id, $bundle));
     $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
     $this->assertSame($enabled, $this->getTrashManager()->isEntityTypeEnabled($entity_type, $bundle));
+  }
+
+  /**
+   * Tests that the trash context is appropriately switched based on the user.
+   */
+  public function testTrashContextSwitching(): void {
+    /** @var \Drupal\Core\Session\AccountSwitcherInterface $account_switcher */
+    $account_switcher = $this->container->get('account_switcher');
+    $administer_trash_user = $this->createUser(['administer trash']);
+    $access_trash_user = $this->createUser(['access trash']);
+    $view_deleted_trash_user = $this->createUser(['view deleted entities']);
+    $normal_user = $this->createUser();
+
+    // The trash context should be 'active' by default.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // The trash context should stay the same.
+    $account_switcher->switchTo($administer_trash_user);
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // The trash context should stay the same.
+    $account_switcher->switchTo($access_trash_user);
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // The trash context should stay the same.
+    $account_switcher->switchTo($view_deleted_trash_user);
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // The trash context should be switched if the "in_trash" query string is
+    // set.
+    \Drupal::request()->query->set('in_trash', '1');
+    $account_switcher->switchTo($administer_trash_user);
+    static::assertEquals('ignore', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    // The trash context should switch back to the 'active' state.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    $account_switcher->switchTo($access_trash_user);
+    static::assertEquals('ignore', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    // The trash context should switch back to the 'active' state.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    $account_switcher->switchTo($view_deleted_trash_user);
+    static::assertEquals('ignore', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    // The trash context should switch back to the 'active' state.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // The state should still be active as the user does not have the necessary
+    // permissions.
+    $account_switcher->switchTo($normal_user);
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // Assert that if the trash context is switched to 'ignore' even if it was
+    // previously 'inactive' as the "in_trash" query string takes precedence.
+    $this->getTrashManager()->setTrashContext('inactive');
+    $account_switcher->switchTo($administer_trash_user);
+    static::assertEquals('ignore', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    // The trash context should switch back to the 'active' state.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+
+    // Assert that the trash context is now 'active' even if it was previously
+    // 'inactive'.
+    $this->getTrashManager()->setTrashContext('inactive');
+    $account_switcher->switchTo($normal_user);
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
+    $account_switcher->switchBack();
+    // Should now be active.
+    static::assertEquals('active', $this->getTrashManager()->getTrashContext());
   }
 
   /**

@@ -8,8 +8,10 @@ use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 #[Group('drupal_cms_helper')]
+#[RunTestsInSeparateProcesses]
 class RecipeFrontPageTest extends BrowserTestBase {
 
   use RecipeTestTrait;

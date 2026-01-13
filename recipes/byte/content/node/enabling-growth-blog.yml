@@ -11,15 +11,6 @@ default:
   title:
     -
       value: 'Enabling Scalable Growth Through SaaS Innovation'
-  created:
-    -
-      value: 1744156410
-  promote:
-    -
-      value: true
-  sticky:
-    -
-      value: false
   revision_translation_affected:
     -
       value: true

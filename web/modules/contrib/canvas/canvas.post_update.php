@@ -147,3 +147,45 @@ function canvas_post_update_0005_use_processed_for_text_props_in_components(arra
 function canvas_post_update_0006_add_service_argument(): void {
   // Empty update to trigger container rebuild.
 }
+
+/**
+ * Ensures the right order of props in Component config entities.
+ *
+ * @see https://www.drupal.org/node/2960601
+ * @see \Drupal\canvas\ShapeMatcher\JsonSchemaFieldInstanceMatcher
+ */
+function canvas_post_update_0007_respect_prop_ordering(array &$sandbox): void {
+  $canvasConfigUpdater = \Drupal::service(CanvasConfigUpdater::class);
+  \assert($canvasConfigUpdater instanceof CanvasConfigUpdater);
+  $canvasConfigUpdater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, Component::ENTITY_TYPE_ID, static fn(Component $component): bool => $canvasConfigUpdater->needsPropReordering($component));
+}
+
+/**
+ * Retrigger SDC component discovery.
+ *
+ * Two reasons:
+ * 1. added support for well-known prop shape matching even if not referencing
+ *    the well-known prop shape in the JSON schema for the SDC prop
+ * 2. using a dot in a `meta:enum` key is no longer forbidden for SDCs
+ *
+ * @see https://www.drupal.org/node/2960601
+ * @see \Drupal\canvas\Plugin\Canvas\ComponentSource\GeneratedFieldExplicitInputUxComponentSourceBase::getComponentInputsForMetadata()
+ * @see \Drupal\canvas\PropShape\PropShape::standardize()
+ * @see \Drupal\canvas\ComponentMetadataRequirementsChecker)
+ */
+function canvas_post_update_0008_rediscover_sdcs(): void {
+  // Empty update to trigger cache wipe, which will re-trigger SDC discovery.
+}
+
+/**
+ * Remove "category" property from existing instances of Component entities.
+ */
+function canvas_post_update_0009_unset_category_property_on_components(array &$sandbox): void {
+  $canvasConfigUpdater = \Drupal::service(CanvasConfigUpdater::class);
+  \assert($canvasConfigUpdater instanceof CanvasConfigUpdater);
+  $canvasConfigUpdater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)
+    ->update($sandbox, Component::ENTITY_TYPE_ID, static fn(Component $component): bool => $canvasConfigUpdater->unsetComponentCategoryProperty($component));
+}

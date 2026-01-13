@@ -1,115 +1,79 @@
 # Mercury Theme
 
-**Mercury** is a modern and flexible Drupal theme designed to help developers quickly build scalable and efficient websites. It utilizes cutting-edge tools such as Vite, Storybook, and the Starshot Design System to create a seamless development experience.
+Mercury is a component-based Drupal theme, providing a modern and flexible starting point for site owners to build scalable and efficient websites using [Drupal Canvas](/project/canvas).
 
-## Features
+## Getting started
 
-- **Vite**: A fast and modern build tool for web development, providing lightning-fast hot module replacement (HMR) and optimized production builds.
-- **Storybook**: Automatically generates stories for components, enabling UI development in isolation and ensuring consistency across components.
-- **Starshot Design System**: A design system used to maintain consistent UI elements and improve design-to-development workflows.n
+To use Mercury, you can install it via Composer, like any other Drupal theme. But Mercury is designed to be copied, rather than used as a contributed theme or base theme, and you should not assume that future updates will be compatible with your site.
 
-## Installation
+To create the clone to use for your site, use Drupal core's starter kit tool:
 
-To install the theme, follow these steps:
+```shell
+cd drupal/web
+php core/scripts/drupal generate-theme my_theme --name="My Custom Theme" --description="A customized version of Mercury." --starterkit=mercury
+```
 
-1. Clone the repository into your Drupal themes directory:
-   `git clone <repository-url> themes/custom/mercury`
-2. Make sure you are using the correct node version
-   `nvm use'
-3. Install the required dependencies using pnpm:
-   `pnpm install`
-4. Enable the theme in Drupal:
-   `drush theme:enable mercury`
-5. (Optional) If you want to run Storybook locally for component development, you can use the following command:
-   `pnpm run storybook`
+This will create a copy of Mercury called `my_theme`, and place it in `themes/my_theme`. This theme is yours, and you can customize it in any way you see fit!
 
----
+To install it in Drupal, either visit the `/admin/appearance` page, or run `drush theme:enable my_theme` at the command line.
 
-## Storybook Generator Vite Plugin
+You can then remove the contributed version via Composer with `composer remove drupal/mercury`.
 
-This Vite plugin automatically generates Storybook stories for your components based on their YAML metadata.
+### Sub-theming
 
-## Installation
+**Don't create your custom theme as a sub-theme of Mercury.** Mercury is meant to be used as a starter kit, and does not provide backward compatibility. This allows us to rapidly innovate, iterate, and improve. If you create a sub-theme of Mercury, it is likely to break in the future.
 
-1. Make sure you have the required dependencies:
+## Customizing
+
+### Fonts & colors
+
+To change the fonts or colors in `my_theme`, edit the `theme.css` file. Changes to `theme.css` do not require a CSS rebuild, but you may need to clear the cache.
+
+### Custom components
+
+Mercury uses [single-directory components](https://www.drupal.org/docs/develop/theming-drupal/using-single-directory-components) and comes with a variety of commonly used components. You can add new components and modify existing ones, but be sure to rebuild the CSS when you make changes.
+
+## Building CSS
+
+Mercury uses [Tailwind](https://tailwindcss.com) to simplify styling by using classes to compose designs directly in the markup.
+
+If you want to customize the Tailwind-generated CSS, install the development tooling dependencies by running the following command in your theme's directory:
+
+```shell
+npm install
+```
+
+If you modify CSS files or classes in a Twig template, you need to rebuild the CSS:
 
 ```bash
-npm install glob --save-dev
+npm run build
 ```
 
-2. Copy the `vite-plugin-storybook-generator.js` file to your project root or plugins directory.
+For development, you can watch for changes and automatically rebuild the CSS:
 
-## Usage
-
-Add the plugin to your `vite.config.js` file:
-
-```javascript
-import { defineConfig } from 'vite';
-import storybookGenerator from './vite-plugin-storybook-generator';
-
-export default defineConfig({
-  plugins: [
-    storybookGenerator({
-      // Optional: override default options
-      componentsDir: 'components', // Default directory containing components
-      forceOverwrite: false, // Whether to overwrite existing story files
-    }),
-    // Your other plugins...
-  ],
-});
+```bash
+npm run dev
 ```
 
-## How It Works
+## Code Formatting
 
-The plugin:
+Mercury uses [Prettier](https://prettier.io) to automatically format code for consistency. The project is configured with plugins for Tailwind CSS and Twig templates.
 
-1. Scans the components directory for component folders
-2. For each component, checks if it has the required files:
-   - `[component-name].component.yml` - YAML metadata file
-   - `[component-name].twig` - Twig template file
-   - `[component-name].css` - CSS file (optional)
-   - `[component-name].js` - JavaScript file (optional, imported if exists)
-3. Generates a Storybook story file (`[component-name].stories.js`) that:
-   - Imports the component's YAML metadata, Twig template, and CSS
-   - Conditionally imports the component's JavaScript file if it exists
-   - Uses the `generateArgTypesAndArgs` helper to generate Storybook args and argTypes
-   - Sets up the story with the Default export using the `twingStory` helper
+For the best experience, [set up Prettier in your editor](https://prettier.io/docs/editors) to automatically format files on save.
 
-## Component Structure
+To format all files in the project:
 
-The plugin expects components to follow this file structure:
-
-```
-components/
-├── component-name/
-│   ├── component-name.component.yml
-│   ├── component-name.twig
-│   ├── component-name.css
-│   ├── component-name.js (optional)
-│   └── component-name.stories.js (will be generated)
+```bash
+npm run format
 ```
 
-## Options
+To check if files are formatted correctly without making changes:
 
-- `componentsDir` (string): Path to the directory containing component folders (default: 'components')
-- `forceOverwrite` (boolean): Whether to overwrite existing story files (default: false)
+```bash
+npm run format:check
+```
 
-## Notes
-
-- The plugin runs during the Vite build process
-- It will log information about generated stories and any errors
-- If `forceOverwrite` is set to `false`, it will skip components that already have a story file
-
-## Storybook: Variants and custom data
-
-Components may have a `component-name.storybook.yml` file with arbitrary data, which will be available in its Twig files as a top-level `storybook` variable.
-
-Components may also have additional Twig files for variants of the main component. Any file named like `component-name~variant-name.twig` will show up as a variant nested under the main component. (Note the tilde (~) separating the component name from the variable name.) If you wish for one of your variants to replace the main component Twig altogether in Storybook, do two things:
-
-- Add a component-name.storybook.yml file, with `hide_main: true` as a top-level property
-- Name your variant file `component-name~main.twig`.
-
-You can see all of the above in action in the Collapsible Section component.
+**Note**: Some files are excluded from formatting via `.prettierignore`, such as Drupal's `html.html.twig` template, which contains placeholder tokens that break Prettier's HTML parsing.
 
 ## Component JavaScript
 
@@ -118,10 +82,10 @@ You can see all of the above in action in the Collapsible Section component.
 1. Extend the `ComponentInstance` class to a new class with the code for your component.
 2. Create a new instance of the `ComponentType` class to automatically activate all the component instances on that page.
 
-For example, here's a stub of `collapsible-section.js`:
+For example, here's a stub of `accordion.js`:
 
 ```js
-import { ComponentType, ComponentInstance } from '../../lib/component.js';
+import { ComponentType, ComponentInstance } from "../../lib/component.js";
 
 // Make a new class with the code for our component.
 //
@@ -129,13 +93,11 @@ import { ComponentType, ComponentInstance } from '../../lib/component.js';
 // the component container, whose selector you provide below. You don't
 // have an array of elements that you have to `.forEach()` over yourself;
 // the ComponentType class handles all that for you.
-class CollapsibleSection extends ComponentInstance {
+class Accordion extends ComponentInstance {
   // Every subclass must have an `init` method to activate the component.
   init() {
-    this.el
-      .querySelector('.collapsible-section__content')
-      .classList.toggle('visible');
-    this.el.addClass('js');
+    this.el.querySelector(".accordion--content").classList.toggle("visible");
+    this.el.addClass("js");
   }
 
   // You may also implement a `remove()` method to clean up when a component is
@@ -152,24 +114,36 @@ class CollapsibleSection extends ComponentInstance {
 // our script.
 new ComponentType(
   // First argument: The subclass of ComponentInstance we just created above.
-  CollapsibleSection,
+  Accordion,
   // Second argument: A camel-case unique ID for the behavior (and for `once()`
   // if applicable).
-  'collapsibleSection',
+  "accordion",
   // Third argument: A selector for `querySelectorAll()`. All matching elements
   // on the page get their own instance of the subclass you created, each of
   // which has `this.el` pointing to one of those matches.
-  '.collapsible-section'
+  ".accordion",
 );
 ```
 
-This is all the code required to be in each component. The ComponentType instance handles finding the elements, running them through `once` if available, and either running them immediately in Storybook or adding them to `Drupal.behaviors`.
+This is all the code required to be in each component. The ComponentType instance handles finding the elements, running them through `once` if available, and adding them to `Drupal.behaviors`.
 
-All the objects created this way will be stored in a global variable so you can do stuff with them later. Since the `namespace` variable at the top of component.js is `mercuryComponents`, you would find the Collapsible Section's ComponentType instance at `window.mercuryComponents.collapsibleSection`.
+All the objects created this way will be stored in a global variable so you can do stuff with them later. Since the `namespace` variable at the top of component.js is `mercuryComponents`, you would find the Accordion's ComponentType instance at `window.mercuryComponents.accordion`.
 
-Furthermore, `window.mercuryComponents.collapsibleSection.instances` is an array of all the ComponentInstance objects, and `window.mercuryComponents.collapsibleSection.elements` is an array of all the component container elements.
+Furthermore, `window.mercuryComponents.accordion.instances` is an array of all the ComponentInstance objects, and `window.mercuryComponents.accordion.elements` is an array of all the component container elements.
 
-## Troubleshooting
+## Known issues
 
-**If XB throws a fatal error, use this comment to reset the page**
-`ddev drush sql:query "delete from key_value_expire where collection='tempstore.shared.experience_builder.auto_save'"`
+Canvas's code components are currently not compatible with Tailwind-based themes like Mercury, and creating a code component will break Mercury's styling. This will be fixed in [#3549628], but for now, here's how to work around it:
+
+1. In Canvas's in-browser code editor, open the Global CSS tab.
+2. Paste the contents of your custom theme's `theme.css` into the code editor. It must be at the top.
+3. Paste the contents of your custom theme's `main.css` into the code editor, removing all the `@import` statements at the top first. It must come _after_ the contents of `theme.css`.
+4. Save the global CSS.
+
+## Getting help
+
+If you have trouble or questions, please [visit the issue queue](https://www.drupal.org/project/issues/mercury?categories=All) or find us on [Drupal Slack](https://www.drupal.org/community/contributor-guide/reference-information/talk/tools/slack), in the `#drupal-cms-support` channel.
+
+## Roadmap
+
+Mercury is under active development. Planned improvements include more components, better customization options, and [Storybook support](https://www.drupal.org/project/mercury/issues/3562711). If you want to contribute to Mercury, check out the `#drupal-cms-development` channel in Drupal Slack.

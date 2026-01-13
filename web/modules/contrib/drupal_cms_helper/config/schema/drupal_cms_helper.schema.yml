@@ -1,0 +1,3 @@
+# @todo Remove when https://www.drupal.org/i/3557882 is released.
+block.settings.dashboard_optional:
+  type: ignore

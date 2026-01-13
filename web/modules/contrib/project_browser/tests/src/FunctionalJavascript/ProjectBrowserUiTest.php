@@ -1113,6 +1113,37 @@ final class ProjectBrowserUiTest extends WebDriverTestBase {
   }
 
   /**
+   * Tests that a block with pagination disabled does not show results count.
+   */
+  public function testBlockWithoutPaginationHasNoResultsCount(): void {
+    // Load a mock page with 1 instance, no pagination.
+    $this->drupalGet('/project-browser/project_browser_test_mock', [
+      'query' => [
+        'instances' => 1,
+        'no_paginate' => [1],
+      ],
+    ]);
+
+    // Wait for the instances to load.
+    $page = $this->getSession()->getPage();
+    $instance_loaded = $page->waitFor(
+      10,
+      fn (DocumentElement $page): bool => !empty($page->findAll('css', '.pb-projects-list')),
+    );
+    $this->assertTrue($instance_loaded);
+
+    $instance = $page->find('css', '[data-project-browser-instance-id]');
+
+    // Check that results count does not show for the instance, which
+    // has been configured with #paginate FALSE. The trick to this is that
+    // div.pb-search-results is always present (layout depends on it), so we
+    // have to actually get the inner text of that div and trim it to see if
+    // it's empty in terms of "it's not showing a result count."
+    $results_for_instance = $instance?->find('css', '.pb-search-results')?->getText() ?? 'NOT FOUND';
+    $this->assertEmpty(trim($results_for_instance));
+  }
+
+  /**
    * Asserts that a given list of project titles are visible on the page.
    *
    * @param array $project_titles

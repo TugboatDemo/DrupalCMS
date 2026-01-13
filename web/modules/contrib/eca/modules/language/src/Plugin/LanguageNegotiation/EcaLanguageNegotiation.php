@@ -3,21 +3,22 @@
 namespace Drupal\eca_language\Plugin\LanguageNegotiation;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\eca\Event\TriggerEvent;
+use Drupal\language\Attribute\LanguageNegotiation;
 use Drupal\language\LanguageNegotiationMethodBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Negotiates the language to use with ECA.
- *
- * @LanguageNegotiation(
- *   id = \Drupal\eca_language\Plugin\LanguageNegotiation\EcaLanguageNegotiation::METHOD_ID,
- *   weight = -20,
- *   name = @Translation("ECA"),
- *   description = @Translation("Event-based language negotiation with ECA.")
- * )
  */
+#[LanguageNegotiation(
+  id: EcaLanguageNegotiation::METHOD_ID,
+  name: new TranslatableMarkup('ECA'),
+  weight: -20,
+  description: new TranslatableMarkup('Event-based language negotiation with ECA.')
+)]
 final class EcaLanguageNegotiation extends LanguageNegotiationMethodBase implements ContainerFactoryPluginInterface {
 
   /**

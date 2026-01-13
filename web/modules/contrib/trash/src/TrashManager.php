@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Drupal\trash;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface;
-use Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\trash\Handler\TrashHandlerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 
 /**
  * Provides the Trash manager.
@@ -26,9 +25,11 @@ class TrashManager implements TrashManagerInterface {
   protected $trashContext = 'active';
 
   public function __construct(
-    protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager,
-    protected EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository,
     protected ConfigFactoryInterface $configFactory,
+    #[AutowireServiceClosure(service: 'entity.definition_update_manager')]
+    protected \Closure $entityDefinitionUpdateManager,
+    #[AutowireServiceClosure(service: 'entity.last_installed_schema.repository')]
+    protected \Closure $entityLastInstalledSchemaRepository,
     #[AutowireIterator(tag: 'trash_handler', indexAttribute: 'entity_type_id')]
     protected iterable $trashHandlers = [],
   ) {}
@@ -70,7 +71,9 @@ class TrashManager implements TrashManagerInterface {
    * {@inheritdoc}
    */
   public function enableEntityType(EntityTypeInterface $entity_type): void {
-    $field_storage_definitions = $this->entityLastInstalledSchemaRepository->getLastInstalledFieldStorageDefinitions($entity_type->id());
+    /** @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_schema_repository */
+    $entity_schema_repository = ($this->entityLastInstalledSchemaRepository)();
+    $field_storage_definitions = $entity_schema_repository->getLastInstalledFieldStorageDefinitions($entity_type->id());
 
     if (!$this->isEntityTypeSupported($entity_type)) {
       throw new \InvalidArgumentException("Trash integration can not be enabled for the {$entity_type->id()} entity type.");
@@ -92,16 +95,23 @@ class TrashManager implements TrashManagerInterface {
       ->setTranslatable(FALSE)
       ->setRevisionable(TRUE);
 
-    $this->entityDefinitionUpdateManager->installFieldStorageDefinition('deleted', $entity_type->id(), 'trash', $storage_definition);
+    /** @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface $entity_definition_update_manager */
+    $entity_definition_update_manager = ($this->entityDefinitionUpdateManager)();
+    $entity_definition_update_manager->installFieldStorageDefinition('deleted', $entity_type->id(), 'trash', $storage_definition);
   }
 
   /**
    * {@inheritdoc}
    */
   public function disableEntityType(EntityTypeInterface $entity_type): void {
-    $field_storage_definitions = $this->entityLastInstalledSchemaRepository->getLastInstalledFieldStorageDefinitions($entity_type->id());
+    /** @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_schema_repository */
+    $entity_schema_repository = ($this->entityLastInstalledSchemaRepository)();
+    $field_storage_definitions = $entity_schema_repository->getLastInstalledFieldStorageDefinitions($entity_type->id());
+
     if (isset($field_storage_definitions['deleted'])) {
-      $this->entityDefinitionUpdateManager->uninstallFieldStorageDefinition($field_storage_definitions['deleted']);
+      /** @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface $entity_definition_update_manager */
+      $entity_definition_update_manager = ($this->entityDefinitionUpdateManager)();
+      $entity_definition_update_manager->uninstallFieldStorageDefinition($field_storage_definitions['deleted']);
     }
   }
 
@@ -136,9 +146,12 @@ class TrashManager implements TrashManagerInterface {
   public function executeInTrashContext($context, callable $function): mixed {
     assert(in_array($context, ['active', 'inactive', 'ignore'], TRUE));
 
+    $previous = $this->trashContext;
     $this->trashContext = $context;
+
     $result = $function();
-    unset($this->trashContext);
+
+    $this->trashContext = $previous;
 
     return $result;
   }

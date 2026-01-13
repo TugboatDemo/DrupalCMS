@@ -17,9 +17,6 @@ default:
   title:
     -
       value: 'Accessibility Tools demo page'
-  created:
-    -
-      value: 1732493181
   promote:
     -
       value: false

@@ -12,13 +12,16 @@ use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\drupal_cms_helper\Drush\Commands\SiteCommands;
 use Drupal\drupal_cms_helper\SiteExporter;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\user\RoleInterface;
 use Drush\TestTraits\DrushTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 #[Group('drupal_cms_helper')]
 #[CoversClass(SiteExporter::class)]
 #[CoversClass(SiteCommands::class)]
+#[RunTestsInSeparateProcesses]
 final class SiteExportTest extends BrowserTestBase {
 
   use DrushTestTrait;
@@ -88,6 +91,20 @@ final class SiteExportTest extends BrowserTestBase {
         fn (string $name): bool => substr_count($name, '.') === 1 && (str_starts_with($name, 'system.') || str_starts_with($name, 'user.')),
       ),
     );
+    // These config objects should be altered by config actions.
+    $list = [
+      'core.menu.static_menu_link_overrides',
+      'user.role.' . RoleInterface::ANONYMOUS_ID,
+      'user.role.' . RoleInterface::AUTHENTICATED_ID,
+    ];
+    foreach ($list as $name) {
+      $this->assertArrayHasKey(
+        str_starts_with($name, 'user.role.') ? 'grantPermissions' : 'simpleConfigUpdate',
+        $recipe['config']['actions'][$name],
+        "$name should be altered with config actions.",
+      );
+      $this->assertFalse($storage->exists($name), "$name should not be exported as a file.");
+    }
 
     // Content should have been exported.
     $finder = new Finder($destination . '/content');

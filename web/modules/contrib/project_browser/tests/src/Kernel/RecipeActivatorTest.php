@@ -84,7 +84,7 @@ final class RecipeActivatorTest extends KernelTestBase {
       machineName: 'My Project',
       body: [],
       title: '',
-      packageName: 'My Project',
+      packageName: 'fake/project',
       type: ProjectType::Recipe,
     );
     // As this project is not installed, RecipeActivator::getPath() will return

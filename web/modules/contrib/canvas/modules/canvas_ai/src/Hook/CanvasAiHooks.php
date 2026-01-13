@@ -47,6 +47,10 @@ class CanvasAiHooks {
             'name' => $this->t('Selected Component'),
             'description' => $this->t('Returns the selected component name passed to the AI Agent.'),
           ],
+          'selected_component_required_props' => [
+            'name' => $this->t('Selected Component Required Props'),
+            'description' => $this->t('Returns the required props of the selected component passed to the AI Agent.'),
+          ],
           'layout' => [
             'name' => $this->t('Layout'),
             'description' => $this->t('Returns the current page layout value passed to the AI Agent.'),
@@ -79,6 +83,10 @@ class CanvasAiHooks {
             'name' => $this->t('Verbose Context for Orchestrator'),
             'description' => $this->t('Returns a detailed context summary for the AI Orchestrator.'),
           ],
+          'custom_libraries' => [
+            'name' => $this->t('Custom libraries in Canvas.'),
+            'description' => $this->t('Returns the custom libraries in Canvas.'),
+          ],
         ],
       ],
     ];
@@ -104,6 +112,10 @@ class CanvasAiHooks {
 
           case 'selected_component':
             $replacements[$original] = $data['selected_component'] ?? NULL;
+            break;
+
+          case 'selected_component_required_props':
+            $replacements[$original] = $data['selected_component_required_props'] ?? NULL;
             break;
 
           case 'layout':
@@ -136,6 +148,10 @@ class CanvasAiHooks {
 
           case 'verbose_context_for_orchestrator':
             $replacements[$original] = !empty($data['verbose_context_for_orchestrator']) ? $data['verbose_context_for_orchestrator'] : NULL;
+            break;
+
+          case 'custom_libraries':
+            $replacements[$original] = $data['custom_libraries'];
             break;
         }
       }

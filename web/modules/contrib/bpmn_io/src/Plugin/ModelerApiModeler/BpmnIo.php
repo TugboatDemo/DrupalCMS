@@ -568,6 +568,17 @@ class BpmnIo extends ModelerBase {
           $plugin->setConfiguration($config);
         }
         $form = $owner->buildConfigurationForm($plugin, $data['entityId'], $data['isNew'] === 'true');
+        // The model owner may have added configuration properties to the plugin
+        // although it's not configurable. This e.g. happens in ECA for action
+        // plugins that have a type property. Let's add the default values
+        // separately for those.
+        if (!($plugin instanceof ConfigurableInterface)) {
+          foreach ($config as $configKey => $configValue) {
+            if (isset($form[$configKey])) {
+              $form[$configKey]['#default_value'] = $configValue;
+            }
+          }
+        }
         $widgets = [];
         $docUrl = $owner->pluginDocUrl($plugin, $owner->ownerComponentId($key));
         if ($docUrl !== NULL) {

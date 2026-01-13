@@ -12,13 +12,13 @@ use Drupal\eca\Event\BeforeInitialExecutionEvent;
 use Drupal\eca_test_array\Event\ArrayWriteEvent;
 use Drupal\eca_test_array\Plugin\Action\ArrayWrite;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests for the ECA processor engine.
- *
- * @group eca
- * @group eca_core
  */
+#[Group('eca')]
+#[Group('eca_core')]
 class ProcessorTest extends KernelTestBase {
 
   /**

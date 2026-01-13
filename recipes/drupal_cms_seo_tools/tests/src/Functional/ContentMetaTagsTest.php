@@ -4,35 +4,25 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\drupal_cms_seo_tools\Functional;
 
-use Composer\InstalledVersions;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
-use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\media\Entity\Media;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\drupal_cms_content_type_base\Traits\ContentModelTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\TestWith;
 
 #[Group('drupal_cms_seo_tools')]
 #[IgnoreDeprecations]
 class ContentMetaTagsTest extends BrowserTestBase {
 
-  use RecipeTestTrait;
+  use ContentModelTestTrait;
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $configSchemaCheckerExclusions = [
-    // This ECA model uses actions which don't have config schema in ECA yet.
-    'eca.eca.setup_seo_fields',
-  ];
 
   private function generateImage(string $extension): Media {
     $random = $this->getRandomGenerator();
@@ -56,20 +46,18 @@ class ContentMetaTagsTest extends BrowserTestBase {
     return $media;
   }
 
-  #[TestWith(['drupal/drupal_cms_blog', 'blog'])]
-  #[TestWith(['drupal/drupal_cms_case_study', 'case_study'])]
-  #[TestWith(['drupal/drupal_cms_events', 'event'])]
-  #[TestWith(['drupal/drupal_cms_news', 'news'])]
-  #[TestWith(['drupal/drupal_cms_page', 'page'])]
-  #[TestWith(['drupal/drupal_cms_person', 'person'])]
-  #[TestWith(['drupal/drupal_cms_project', 'project'])]
-  public function testMetaTagsForContentType(string $recipe, string $node_type): void {
-    $dir = InstalledVersions::getInstallPath($recipe);
-    $this->applyRecipe($dir);
+  public function testMetaTags(): void {
+    // For performance, test all these content types in one test, rather than
+    // a data provider or #[TestWith] attributes.
+    $content_types = $this->applyAllContentTypeRecipes();
 
     $dir = realpath(__DIR__ . '/../../..');
     $this->applyRecipe($dir);
 
+    array_walk($content_types, $this->doTestMetaTagsForContentType(...));
+  }
+
+  private function doTestMetaTagsForContentType(string $node_type): void {
     // If we create a node of this content type, all expected meta tags should
     // be there.
     $random = $this->getRandomGenerator();
@@ -84,12 +72,6 @@ class ContentMetaTagsTest extends BrowserTestBase {
     $assert_session = $this->assertSession();
     $assert_session->statusCodeEquals(200);
 
-    $save_node = function () use ($node): void {
-      $node->save();
-      $this->container->get('cache.page')->deleteAll();
-      $this->getSession()->reload();
-    };
-
     // Assert the meta tags which are static, or don't have any configured
     // overrides.
     $absolute_node_url = $node_url->setAbsolute()->toString();
@@ -100,15 +82,21 @@ class ContentMetaTagsTest extends BrowserTestBase {
     $assert_session->elementAttributeContains('css', 'meta[property="og:url"]', 'content', $absolute_node_url);
     $assert_session->elementAttributeContains('css', 'meta[name="referrer"]', 'content', 'unsafe-url');
     $assert_session->elementAttributeContains('css', 'link[rel="shortlink"]', 'href', Url::fromRoute('<front>')->setAbsolute()->toString());
-    $assert_session->elementAttributeContains('css', 'meta[name="rights"]', 'content', sprintf('Copyright ©%s All rights reserved.', date('Y')));
+    $assert_session->elementAttributeContains('css', 'meta[name="rights"]', 'content', 'Copyright © All rights reserved.');
     $assert_session->elementAttributeContains('css', 'meta[name="twitter:card"]', 'content', 'summary_large_image');
     $original_changed_time = $node->getChangedTime();
     $assert_session->elementAttributeContains('css', 'meta[property="og:updated_time"]', 'content', date('c', $original_changed_time));
 
+    // Regardless of whether it's a hit or miss, the node should be cacheable.
+    $this->assertStringNotContainsStringIgnoringCase(
+      'UNCACHEABLE',
+      $this->getSession()->getResponseHeader('X-Drupal-Dynamic-Cache'),
+    );
+
     // Re-saving the node should update the og:updated_time meta tag.
     $updated_changed_time = $original_changed_time + 30;
-    $node->setChangedTime($updated_changed_time);
-    $save_node();
+    $node->setChangedTime($updated_changed_time)->save();
+    $this->drupalGet($node->toUrl());
     $assert_session->elementAttributeContains('css', 'meta[property="og:updated_time"]', 'content', date('c', $updated_changed_time));
 
     // Assert the meta tags for field_featured_image, and that field_seo_image
@@ -135,8 +123,8 @@ class ContentMetaTagsTest extends BrowserTestBase {
       $assert_session->elementAttributeContains('css', 'meta[name="twitter:image:alt"]', 'content', $alt_text);
     };
     $assert_image($node->field_featured_image->entity);
-    $node->set('field_seo_image', $this->generateImage('jpg'));
-    $save_node();
+    $node->set('field_seo_image', $this->generateImage('jpg'))->save();
+    $this->drupalGet($node->toUrl());
     $assert_image($node->field_seo_image->entity);
 
     // Assert the meta tags for the node title and that field_seo_title takes
@@ -148,8 +136,8 @@ class ContentMetaTagsTest extends BrowserTestBase {
     };
     $assert_title($node->getTitle());
     $seo_title = $this->randomMachineName();
-    $node->set('field_seo_title', $seo_title);
-    $save_node();
+    $node->set('field_seo_title', $seo_title)->save();
+    $this->drupalGet($node->toUrl());
     $assert_title($seo_title);
 
     // Assert the meta tags for field_description and that field_seo_description
@@ -160,8 +148,8 @@ class ContentMetaTagsTest extends BrowserTestBase {
       $assert_session->elementAttributeContains('css', 'meta[name="twitter:description"]', 'content', $description);
     };
     $assert_description($node->field_description->value);
-    $node->set('field_seo_description', $random->sentences(4));
-    $save_node();
+    $node->set('field_seo_description', $random->sentences(4))->save();
+    $this->drupalGet($node->toUrl());
     $assert_description($node->field_seo_description->value);
   }
 

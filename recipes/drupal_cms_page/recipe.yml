@@ -6,9 +6,6 @@ recipes:
 config:
   strict: false
   actions:
-    core.entity_view_display.node.page.default:
-      enableLayoutBuilder: {  }
-      allowLayoutOverrides: true
     user.role.content_editor:
       grantPermissions:
         - 'create page content'

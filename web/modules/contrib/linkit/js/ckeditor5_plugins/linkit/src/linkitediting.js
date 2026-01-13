@@ -137,7 +137,7 @@ export default class LinkitEditing extends Plugin {
           // In a scenario where the displayedText is blank, fall back on the
           // linkText, and if that is empty, use the href from args[0].
           let newText = displayedText || linkText || args[0];
-          let newRange = writer.createRange(range.start, range.start.getShiftedBy(newText.length));
+          let newRange = writer.createRange(range.start, range.start.getShiftedBy(linkText.length));
           return newRange;
         };
 

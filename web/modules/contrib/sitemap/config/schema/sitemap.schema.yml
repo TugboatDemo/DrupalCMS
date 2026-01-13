@@ -128,3 +128,16 @@ sitemap_plugin_settings.vocabulary:
       type: integer
       label: 'RSS depth'
       nullable: true
+
+# Schema for the sitemap_syndicate block plugin.
+block.settings.sitemap_syndicate:
+  type: block_settings
+  label: 'Syndicate block settings'
+  deprecated: "The Syndicate block is deprecated in sitemap:8.x-2.x and is removed from sitemap:3.0.0."
+  mapping:
+    cache:
+      type: ignore
+    rss_feed_path:
+      type: path
+      label: "Feed URL"
+      nullable: true

@@ -8,13 +8,13 @@ use Drupal\eca\Entity\Eca;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Execution chain tests using plugins of eca_form.
- *
- * @group eca
- * @group eca_form
  */
+#[Group('eca')]
+#[Group('eca_form')]
 class FormExecutionChainTest extends KernelTestBase {
 
   /**

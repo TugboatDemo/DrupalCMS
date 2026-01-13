@@ -41,11 +41,14 @@ use Symfony\Component\Validator\ConstraintViolationListInterface;
  * @phpstan-type PersonalizationSwitchInputArray array{variants: array<int, string>}
  * @phpstan-type PersonalizationCaseInputArray array{variant_id: string, segments: array<int, string>}
  * @phpstan-type PersonalizationInputArray PersonalizationSwitchInputArray|PersonalizationCaseInputArray
+ *
+ * @phpstan-ignore classExtendsInternalClass.classExtendsInternalClass
  */
 #[ComponentSource(
   id: self::SOURCE_PLUGIN_ID,
   label: new TranslatableMarkup('Personalization'),
   supportsImplicitInputs: FALSE,
+  discovery: FALSE,
 )]
 final class Personalization extends ComponentSourceBase implements
   ComponentSourceWithSlotsInterface,
@@ -327,7 +330,7 @@ final class Personalization extends ComponentSourceBase implements
   public function buildComponentInstanceForm(
     array $form,
     FormStateInterface $form_state,
-    ?Component $component = NULL,
+    Component $component,
     string $component_instance_uuid = '',
     array $inputValues = [],
     ?EntityInterface $entity = NULL,

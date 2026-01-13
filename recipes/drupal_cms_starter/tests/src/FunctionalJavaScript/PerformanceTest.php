@@ -68,7 +68,11 @@ class PerformanceTest extends PerformanceTestBase {
    */
   protected function doTestAnonymousFrontPage(): void {
     $this->drupalGet('');
+    // Allow time for asset and image derivative requests, and end of request
+    // tasks to complete.
+    sleep(2);
     $this->drupalGet('');
+    sleep(2);
 
     // Test frontpage.
     $performance_data = $this->collectPerformanceData(function () {
@@ -80,16 +84,13 @@ class PerformanceTest extends PerformanceTestBase {
       'CacheGetCount' => 2,
       'CacheSetCount' => 0,
       'CacheTagLookupQueryCount' => 1,
-      // If there are small changes in the below limits, e.g. under 5kb, the
-      // ceiling can be raised without any investigation. However large increases
-      // indicate a large library is newly loaded for anonymous users.
-      'StylesheetCount' => 2,
-      'StylesheetBytes' => 80000,
-      'ScriptCount' => 1,
-      'ScriptBytes' => 23000,
+      'StylesheetCount' => 5,
+      'StylesheetBytes' => 61000,
+      'ScriptCount' => 4,
+      'ScriptBytes' => 14000,
     ];
     $this->assertMetrics($expected, $performance_data);
-    $this->assertSession()->elementExists('css', 'article.node');
+    $this->assertSession()->pageTextContains('Your content goes here');
   }
 
   /**
@@ -100,19 +101,19 @@ class PerformanceTest extends PerformanceTestBase {
     $editor->addRole('content_editor')->save();
     $this->drupalLogin($editor);
     // Warm various caches.
-    $this->drupalGet('');
-    // Allow one second for post response tasks to write caches.
+    $this->drupalGet('user/2');
+    // Allow time for asset and image derivative requests, and end of request
+    // tasks to complete.
     sleep(1);
-    $this->drupalGet('');
+    $this->drupalGet('user/2');
     sleep(1);
 
     // Test frontpage.
     $performance_data = $this->collectPerformanceData(function () {
-      $this->drupalGet('');
+      $this->drupalGet('user/2');
     }, 'drupalCMSEditorFrontPage');
-    $assert_session = $this->assertSession();
-    $assert_session->elementAttributeContains('named', ['link', 'Dashboard'], 'class', 'toolbar-button--icon--navigation-dashboard');
-    $assert_session->elementExists('css', 'article.node');
+    $this->assertSession()->elementAttributeContains('named', ['link', 'Dashboard'], 'class', 'toolbar-button--icon--navigation-dashboard');
+    $this->assertSession()->pageTextContains('Member for');
 
     // The following queries are the only database queries executed for editors on the
     // front page.
@@ -120,32 +121,35 @@ class PerformanceTest extends PerformanceTestBase {
       'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
       'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
       'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node/2" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
-      'SELECT rid FROM "redirect" WHERE hash IN ("NKzL8tFQHWuVsiKsKSy9LeHXQXJXBi02otuiixBL8TE", "hef6TjxChWEKH2Wao9m0dVOigdwgf67UkEGlfXcimoA") ORDER BY LENGTH(redirect_source__query) DESC',
+      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/user/2" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT rid FROM "redirect" WHERE hash IN ("BBl_LK6WJ9pHpq8pOZk0UPGAg_j8q2V5cMW90xdBwkA", "LqXKapiRXY4tnrX1snQ-dOWL3vPG5j41xz2aKX8HFRc") AND enabled = 1 ORDER BY LENGTH(redirect_source__query) DESC',
+      'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:mercury" ) AND "collection" = "config.entity.key_store.page_region"',
+      'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:mercury" ) AND "collection" = "config.entity.key_store.page_region"',
+      'SELECT "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("menu_name" = "footer") AND ("expanded" = 1) AND ("has_children" = 1) AND ("enabled" = 1) AND ("parent" IN ("")) AND ("id" NOT IN (""))',
+      'SELECT "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("menu_name" = "main") AND ("expanded" = 1) AND ("has_children" = 1) AND ("enabled" = 1) AND ("parent" IN ("")) AND ("id" NOT IN (""))',
       'SELECT "config"."name" AS "name" FROM "config" "config" WHERE ("collection" = "") AND ("name" LIKE "klaro.klaro_app.%" ESCAPE \'\\\\\') ORDER BY "collection" ASC, "name" ASC',
-      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
-      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "2" AND "u"."default_langcode" = 1',
-      'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "2"',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/page/1" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/1" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
     ];
 
     // To avoid a test failure when a database query is removed, check only
     // that a new database query has not been added.
+    $this->assertSame($queries, $performance_data->getQueries());
     $query_diff = array_diff($performance_data->getQueries(), $queries);
     $this->assertSame([], $query_diff);
-    $this->assertLessThanOrEqual(9, $performance_data->getQueryCount());
 
     $expected = [
-      'QueryCount' => 9,
-      'CacheGetCount' => 70,
+      'QueryCount' => 12,
+      'CacheGetCount' => 81,
       'CacheSetCount' => 0,
-      'CacheTagLookupQueryCount' => 9,
+      'CacheTagLookupQueryCount' => 8,
       // If there are small changes in the below limits, e.g. under 5kb, the
       // ceiling can be raised without any investigation. However large increases
       // indicate a large library is newly loaded for authenticated users.
-      'StylesheetCount' => 3,
-      'StylesheetBytes' => 218000,
-      'ScriptCount' => 4,
-      'ScriptBytes' => 244800,
+      'StylesheetCount' => 7,
+      'StylesheetBytes' => 224500,
+      'ScriptCount' => 8,
+      'ScriptBytes' => 238500,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

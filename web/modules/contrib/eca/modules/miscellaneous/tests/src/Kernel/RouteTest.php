@@ -12,6 +12,7 @@ use Drupal\eca_misc\Plugin\RouteInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
@@ -19,10 +20,9 @@ use Prophecy\PhpUnit\ProphecyTrait;
  *
  * This covers "eca_route_match" condition and "eca_token_load_route_param"
  * action plugins.
- *
- * @group eca
- * @group eca_misc
  */
+#[Group('eca')]
+#[Group('eca_misc')]
 class RouteTest extends KernelTestBase {
 
   use ProphecyTrait;

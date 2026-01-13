@@ -5,8 +5,10 @@ namespace Drupal\eca_views\Plugin\views\access;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\eca\Event\AccessEventInterface;
 use Drupal\eca\Event\TriggerEvent;
+use Drupal\views\Attribute\ViewsAccess;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
@@ -15,13 +17,12 @@ use Symfony\Component\Routing\Route;
  * Access plugin that provides ECA based access control.
  *
  * @ingroup views_access_plugins
- *
- * @ViewsAccess(
- *   id = "eca",
- *   title = @Translation("ECA"),
- *   help = @Translation("Access will be granted by an ECA model.")
- * )
  */
+#[ViewsAccess(
+  id: 'eca',
+  title: new TranslatableMarkup('ECA'),
+  help: new TranslatableMarkup('Access will be granted by an ECA model.')
+)]
 class Eca extends AccessPluginBase implements CacheableDependencyInterface {
 
   /**

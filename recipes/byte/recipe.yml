@@ -2,13 +2,20 @@ name: Byte
 type: Site
 description: 'Designed for a SaaS product website, this template includes landing pages, a blog, newsletter sign up and other features.'
 recipes:
+  - drupal_cms_admin_ui
+  - drupal_cms_anti_spam
+  - drupal_cms_authentication
   - drupal_cms_blog
   - drupal_cms_forms
-  - drupal_cms_starter
-  # Put SEO tools last so that it adds its fields to whatever content types were
-  # created by the preceding recipes.
+  - drupal_cms_media
+  - drupal_cms_privacy_basic
+  - drupal_cms_seo_basic
   - drupal_cms_seo_tools
+  - easy_email_express
 install:
+  - byte_theme
+  # CVA is needed for Byte Theme to work.
+  - cva
   - project_browser
   - ui_icons_menu
 config:
@@ -30,13 +37,6 @@ config:
       addToAllBundles:
         label: Components
         description: Stores a component tree for Canvas.
-    # Use Mercury's dark color scheme by default.
-    mercury.settings:
-      simpleConfigUpdate:
-        scheme: byte-dark
-        logo:
-          use_default: false
-          path: 'public://byte-logo.svg'
     # Only show basic metatag fields on Canvas pages.
     metatag.settings:
       simpleConfigUpdate:
@@ -60,15 +60,24 @@ config:
           value: 'main:'
     project_browser.admin_settings:
       simpleConfigUpdate:
-        # @see recommended.yml
-        enabled_sources.recommended.uri: 'https://git.drupalcode.org/api/v4/projects/194416/repository/files/recommended.yml/raw?ref=HEAD'
+        enabled_sources:
+          recommended:
+            # @see recommended.yml
+            uri: 'https://git.drupalcode.org/api/v4/projects/194416/repository/files/recommended.yml/raw?ref=HEAD'
+            ttl: 1
+          drupalorg_jsonapi: []
+        default_source: recommended
     system.site:
       simpleConfigUpdate:
+        page.404: '/404'
         # The Home page, built in Canvas.
         page.front: '/home'
+    system.theme:
+      simpleConfigUpdate:
+        default: byte_theme
     views.view.blog:
       setProperties:
-        # Opt this view into the grid-snap styling that Mercury offers.
+        # Opt this view into the grid-snap styling that Byte offers.
         tag: 'snap'
         # The default display should show 6 items per page, with a full pager.
         display.default.display_options.pager:

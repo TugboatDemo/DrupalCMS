@@ -39,33 +39,40 @@ class ModelerApiMenuLink extends DeriverBase implements ContainerDeriverInterfac
    */
   public function getDerivativeDefinitions($base_plugin_definition): array {
     $this->derivatives = [];
+    $base_plugin_definition['menu_name'] = 'admin';
     foreach ($this->modelOwnerPluginManager->getAllInstances() as $owner) {
       $basePath = $owner->configEntityBasePath();
       if ($basePath === NULL) {
         continue;
       }
       $type = $owner->configEntityTypeId();
-      $this->derivatives['entity.' . $type . '.collection'] = [
-        'title' => $owner->label(),
-        'parent' => $this->modelerApiService->getParentMenuName($owner->configEntityBasePath()) ?? 'system.admin_config_workflow',
-        'description' => $owner->description(),
-        'route_name' => 'entity.' . $type . '.collection',
-      ];
-      $name = 'entity.' . $type . '.import';
-      if ($this->modelerApiService->getRouteByName($name)) {
-        $this->derivatives[$name] = [
-          'title' => $this->t('Import'),
-          'parent' => 'entity.' . $type . '.collection',
-          'description' => $this->t('Import a model'),
-          'route_name' => $name,
+      $collectionName = 'entity.' . $type . '.collection';
+      if ($this->modelerApiService->getRouteByName($collectionName)) {
+        $this->derivatives[$collectionName] = [
+          'title' => $owner->label(),
+          'parent' => $this->modelerApiService->getParentMenuName($owner->configEntityBasePath()) ?? 'system.admin_config_workflow',
+          'description' => $owner->description(),
+          'route_name' => $collectionName,
         ];
+        $name = 'entity.' . $type . '.import';
+        if ($this->modelerApiService->getRouteByName($name)) {
+          $this->derivatives[$name] = [
+            'title' => $this->t('Import'),
+            'parent' => $collectionName,
+            'description' => $this->t('Import a model'),
+            'route_name' => $name,
+          ];
+        }
+        $name = 'entity.' . $type . '.settings';
+        if ($this->modelerApiService->getRouteByName($name)) {
+          $this->derivatives[$name] = [
+            'title' => $this->t('Settings'),
+            'parent' => $collectionName,
+            'description' => $this->t('Configure the model'),
+            'route_name' => $name,
+          ];
+        }
       }
-      $this->derivatives['entity.' . $type . '.settings'] = [
-        'title' => $this->t('Settings'),
-        'parent' => 'entity.' . $type . '.collection',
-        'description' => $this->t('Configure the model'),
-        'route_name' => 'entity.' . $type . '.settings',
-      ];
     }
     foreach ($this->derivatives as &$entry) {
       $entry += $base_plugin_definition;

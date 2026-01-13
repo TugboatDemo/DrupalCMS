@@ -17,13 +17,13 @@ use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\locale\StringStorageInterface;
 use function current;
 use function parse_url;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests for plugins of the eca_language module.
- *
- * @group eca
- * @group eca_language
  */
+#[Group('eca')]
+#[Group('eca_language')]
 class LanguageTest extends KernelTestBase {
 
   /**

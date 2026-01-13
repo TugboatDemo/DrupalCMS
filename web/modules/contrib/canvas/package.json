@@ -8,10 +8,11 @@
     "test": "tests"
   },
   "workspaces": [
+    "packages/*",
     "cli",
     "docs/user",
-    "packages/*",
-    "tests/modules/canvas_test_extension"
+    "tests/modules/canvas_test_extension",
+    "ui/lib/astro-hydration"
   ],
   "scripts": {
     "test:playwright": "playwright install && playwright test",
@@ -45,5 +46,8 @@
     "prettier": "^3.5.3",
     "typescript-eslint": "^8.32.0",
     "yaml-lint": "^1.7.0"
+  },
+  "overrides": {
+    "glob": "^11.1.0"
   }
 }

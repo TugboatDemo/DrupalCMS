@@ -120,6 +120,9 @@ class ShapeMatchingHooks {
         $info[$plugin_id]['class'] = $class;
       }
     }
+
+    // @todo Remove this forward port of https://www.drupal.org/project/drupal/issues/3521088 once Canvas requires Drupal >=11.3
+    $info['changed']['constraints'] = $info['created']['constraints'] = $info['timestamp']['constraints'];
   }
 
   /**
@@ -234,7 +237,7 @@ class ShapeMatchingHooks {
   }
 
   /**
-   * Implements hook_storage_prop_shape_alter().
+   * Implements hook_canvas_storable_prop_shape_alter().
    *
    * (On behalf of the Media Library module.)
    *
@@ -246,8 +249,8 @@ class ShapeMatchingHooks {
    * @see \Drupal\canvas\JsonSchemaInterpreter\JsonSchemaType::computeStorablePropShape()
    * @todo Move to Media Library module, eventually.
    */
-  #[Hook('storage_prop_shape_alter', module: 'media_library')]
-  public function mediaLibraryStoragePropShapeAlter(CandidateStorablePropShape $storable_prop_shape): void {
+  #[Hook('canvas_storable_prop_shape_alter', module: 'media_library')]
+  public function mediaLibraryStorablePropShapeAlter(CandidateStorablePropShape $storable_prop_shape): void {
     $media_type_ids = NULL;
 
     // @see json-schema-definitions://canvas.module/stream-wrapper-image-uri
@@ -265,6 +268,11 @@ class ShapeMatchingHooks {
         && ($storable_prop_shape->shape->schema['x-allowed-schemes'] ?? []) === ['public']
       )
     ) {
+      // This alter hook won't have any effect unless MediaTypes exist that use
+      // a particular MediaSource plugin. So, whenever the list of MediaTypes
+      // changes, this hook should be called again (for this shape).
+      $storable_prop_shape->addCacheTags(['config:media_type_list']);
+
       $media_types = self::getMediaTypesForSource(Image::class);
       if (!empty($media_types)) {
         $media_type_ids = array_keys($media_types);
@@ -287,6 +295,11 @@ class ShapeMatchingHooks {
       isset($storable_prop_shape->shape->schema['$ref']) &&
       array_key_exists($storable_prop_shape->shape->schema['$ref'], self::SCHEMA_TO_MEDIA_SOURCE)
     ) {
+      // This alter hook won't have any effect unless MediaTypes exist that use
+      // a particular MediaSource plugin. So, whenever the list of MediaTypes
+      // changes, this hook should be called again (for this shape).
+      $storable_prop_shape->addCacheTags(['config:media_type_list']);
+
       $media_source_class = self::SCHEMA_TO_MEDIA_SOURCE[$storable_prop_shape->shape->schema['$ref']];
       $media_types = self::getMediaTypesForSource($media_source_class);
       if (!empty($media_types)) {
@@ -310,22 +323,22 @@ class ShapeMatchingHooks {
   }
 
   /**
-   * Implements hook_storage_prop_shape_alter().
+   * Implements hook_canvas_storable_prop_shape_alter().
    *
    * (On behalf of the Date Range module.)
    *
    * @see \Drupal\canvas\JsonSchemaInterpreter\JsonSchemaType::computeStorablePropShape()
    * @see \Drupal\datetime_range\Plugin\Field\FieldType\DateRangeItem
    */
-  #[Hook('storage_prop_shape_alter', module: 'datetime_range')]
-  public function datetimeRangeStoragePropShapeAlter(CandidateStorablePropShape $storable_prop_shape): void {
+  #[Hook('canvas_storable_prop_shape_alter', module: 'datetime_range')]
+  public function datetimeRangeStorablePropShapeAlter(CandidateStorablePropShape $storable_prop_shape): void {
     if ($storable_prop_shape->shape->schema == [
       'type' => 'object',
-      '$ref' => 'json-schema-definitions://sdc_test_all_props.module/date-range',
+      '$ref' => 'json-schema-definitions://canvas.module/date-range',
     ]) {
       $storable_prop_shape->fieldTypeProp = new FieldTypeObjectPropsExpression('daterange', [
-        'from' => new FieldTypePropExpression('daterange', 'end_value'),
-        'to' => new FieldTypePropExpression('daterange', 'value'),
+        'from' => new FieldTypePropExpression('daterange', 'value'),
+        'to' => new FieldTypePropExpression('daterange', 'end_value'),
       ]);
       $storable_prop_shape->fieldStorageSettings = ['datetime_type' => DateTimeItem::DATETIME_TYPE_DATE];
       // @todo Make this actually work in component instance forms in https://www.drupal.org/project/canvas/issues/3523379

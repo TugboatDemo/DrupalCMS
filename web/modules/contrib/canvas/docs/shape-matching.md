@@ -54,6 +54,7 @@ to one of us! 😊 🙏
   - TBD: `remote prop source`: a `prop source` powered by a remote source ("external data"), i.e. data stored outside Drupal
 - `structured data`: the data model defined by a Site Builder in a `content type`, and whose smallest units are `field props` — queryable by Views
 - `unstructured data`: the ad-hoc data used to populate `component input`s that are not populated using `unstructured data` — NOT queryable by Views, this should be minimized/discouraged
+- `well-known prop shape`: a `prop shape` that is _named_: one that is defined in a module's or theme's `/schema.json` file and is then referenced (`$ref`) from the JSON schema for that `component input`.
 
 ## 2. Product requirements
 
@@ -134,6 +135,10 @@ versus required occurrences of a `prop shape`:
 
 The found `field instance` can then be used in a `dynamic prop source`, that can be _evaluated_ to retrieve the stored
 value that fits in the `prop shape`.
+ℹ️ A `dynamic prop source` may specify a single "adapter" plugin (which must take a single input), which allows
+Canvas to suggest field properties that _conceptually_ fit perfectly, but don't _technically_ fit, a particular `prop shape`.
+For example: "timestamp" fields (which contain UNIX timestamps) can be made available to props that have the
+`type: string, format: date` shape, by using the `unix_to_date` adapter plugin.
 
 See `\Drupal\canvas\PropSource\DynamicPropSource`.
 
@@ -149,20 +154,35 @@ choose one.
 See:
 - `\Drupal\canvas\JsonSchemaInterpreter\JsonSchemaType::computeStorablePropShape()`
 - `\Drupal\canvas\PropShape\StorablePropShape`
-- `hook_storage_prop_shape_alter()`
+- `\Drupal\canvas\PropShape\CandidateStorablePropShape`
+- `\Drupal\canvas\PropShape\PropShape::standardize()`
+- `hook_canvas_storable_prop_shape_alter()`
 
 For any `unstructured data`, no field settings exist yet, so the appropriate settings for a `prop shape` must be
 generated. `JsonSchemaType::computeStorablePropShape()` contains logic to that relies only on `field type`s
 available in Drupal core. Unlike for `structured data`, no additional complexity is necessary for required versus
 optional `component input`s.
 
-Contributed modules can implement `hook_storage_prop_shape_alter()` to make different choices.
+Contributed modules can implement `hook_canvas_storable_prop_shape_alter()` to make different choices. Such hooks
+receive a `\Drupal\canvas\PropShape\CandidateStorablePropShape` value object, which contains:
+- the precise storage decision: field type, storage settings, instance settings and cardinality
+- the corresponding UX decision: field widget
+- the cacheability that led to this decision — e.g. the presence of certain config
+
+Any `component input` whose `prop shape` corresponds to a `well-known prop shape` may cause _two_ invocations of that
+alter hook:
+1. once for the `well-known prop shape` (so: `"type": "string|object|…", "$ref": "json-schema-definitions://…"`), if any
+2. once for the resolved equivalent (with `$ref` resolved) — unless the above already found a result
 
 The computed `\Drupal\canvas\PropShape\StorablePropShape` can be used to create a `static prop source`
 (which contains all information for the `conjured field` that powers it), that can be _evaluated_ to retrieve the stored
 value that fits in the `prop shape`.
 
 See `\Drupal\canvas\PropSource\StaticPropSource`.
+
+💡 Whenever the cacheability that led to a decision is invalidated (e.g. some config was saved), these hooks are executed
+again, to ensure an up-to-date decision for how to store props of the given `prop shape`.
+Note: if the result is  different, a [new version is added to the `Component config entity`](config-management.md#3.1).
 
 ⚠️ When choosing to use `unstructured data` to populate a `component input`, Canvas decides
 using the aforementioned logic what `field type`, `field widget` et cetera to use. Only when using `structured data`,

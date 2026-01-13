@@ -60,6 +60,35 @@ function trash_restore_entity(EntityInterface $entity): void {
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ */
+function trash_module_implements_alter(array &$implementations, $hook): void {
+  if (!isset($implementations['trash'])) {
+    return;
+  }
+  switch ($hook) {
+    // Move the trash hook implementation to the top of the list.
+    case 'views_query_alter':
+    case 'views_pre_execute':
+    case 'views_pre_render':
+      $group = $implementations['trash'];
+      $implementations = ['trash' => $group] + $implementations;
+      break;
+
+    // Ensure that the trash hook is usually ran as one of the last
+    // implementation hooks. That way other modules still work within the
+    // relevant trash context.
+    case 'views_post_build':
+    case 'views_post_render':
+    case 'views_post_execute':
+      $group = $implementations['trash'];
+      unset($implementations['trash']);
+      $implementations['trash'] = $group;
+      break;
+  }
+}
+
+/**
  * Implements hook_entity_base_field_info().
  */
 #[LegacyHook]
@@ -110,11 +139,43 @@ function trash_views_query_alter(ViewExecutable $view, QueryPluginBase $query): 
 }
 
 /**
+ * Implements hook_views_post_build().
+ */
+#[LegacyHook]
+function trash_views_post_build(ViewExecutable $view): void {
+  /** @var \Drupal\trash\Hook\TrashViewsHooks $trash_views_hooks */
+  $trash_views_hooks = \Drupal::service(TrashViewsHooks::class);
+  $trash_views_hooks->viewsPostBuild($view);
+}
+
+/**
+ * Implements hook_views_post_execute().
+ */
+#[LegacyHook]
+function trash_views_post_execute(ViewExecutable $view): void {
+  /** @var \Drupal\trash\Hook\TrashViewsHooks $trash_views_hooks */
+  $trash_views_hooks = \Drupal::service(TrashViewsHooks::class);
+  $trash_views_hooks->viewsPostExecute($view);
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+#[LegacyHook]
+function trash_views_pre_render(ViewExecutable $view): void {
+  /** @var \Drupal\trash\Hook\TrashViewsHooks $trash_views_hooks */
+  $trash_views_hooks = \Drupal::service(TrashViewsHooks::class);
+  $trash_views_hooks->viewsPreRender($view);
+}
+
+/**
  * Implements hook_views_post_render().
  */
 #[LegacyHook]
 function trash_views_post_render(ViewExecutable $view): void {
-  \Drupal::service(TrashViewsHooks::class)->viewsPostRender($view);
+  /** @var \Drupal\trash\Hook\TrashViewsHooks $trash_views_hooks */
+  $trash_views_hooks = \Drupal::service(TrashViewsHooks::class);
+  $trash_views_hooks->viewsPostRender($view);
 }
 
 /**

@@ -5,7 +5,7 @@ package: User interface
 core_version_requirement: '^10.1 || ^11'
 configure: entity.linkit_profile.collection
 
-# Information added by Drupal.org packaging script on 2025-11-06
-version: '7.0.11'
+# Information added by Drupal.org packaging script on 2025-12-11
+version: '7.0.12'
 project: 'linkit'
-datestamp: 1762459910
+datestamp: 1765467400

@@ -231,7 +231,7 @@ class ExportRecipe {
     $recipe = [
       'name' => $name,
       'description' => $description,
-      'type' => 'Modeler API',
+      'type' => 'Workflow',
     ];
     if ($modules) {
       $recipe['install'] = $modules;
@@ -242,9 +242,10 @@ class ExportRecipe {
     if ($imports) {
       $recipe['config']['import'] = $imports;
     }
-    if (isset($recipe['config'])) {
-      $recipe['config']['strict'] = FALSE;
+    if (!isset($recipe['config'])) {
+      $recipe['config'] = [];
     }
+    $recipe['config']['strict'] = FALSE;
     return $recipe;
   }
 

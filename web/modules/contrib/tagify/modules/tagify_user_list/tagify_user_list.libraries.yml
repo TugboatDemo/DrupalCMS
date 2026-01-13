@@ -6,7 +6,9 @@ user_list:
       css/tagify_user_list.css: {}
   dependencies:
     - core/jquery
-    - core/jquery.once
+    - core/once
     - core/drupal
+    - core/drupalSettings
     - core/drupal.debounce
     - core/sortable
+    - tagify/default

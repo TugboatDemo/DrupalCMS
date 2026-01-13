@@ -7,6 +7,7 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\eca\ContentTypeCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests for the access condition plugins.
@@ -14,10 +15,9 @@ use Drupal\user\Entity\User;
  * Access condition plugins:
  * - eca_entity_is_accessible
  * - eca_entity_field_is_accessible.
- *
- * @group eca
- * @group eca_content
  */
+#[Group('eca')]
+#[Group('eca_content')]
 class EntityAccessibleTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;

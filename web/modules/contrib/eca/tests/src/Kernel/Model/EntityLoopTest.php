@@ -4,13 +4,13 @@ namespace Drupal\Tests\eca\Kernel\Model;
 
 use Drupal\eca_base\Hook\BaseHooks;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Model test for entity loops.
- *
- * @group eca
- * @group eca_model
  */
+#[Group('eca')]
+#[Group('eca_model')]
 class EntityLoopTest extends Base {
 
   /**

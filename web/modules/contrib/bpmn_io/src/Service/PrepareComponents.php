@@ -227,7 +227,6 @@ readonly class PrepareComponents {
         foreach ($this->prepareConfigFields($childForm, $extraDescriptions) as $childKey => $childField) {
           $fields[$childKey] = $childField;
         }
-        continue;
       }
       $label = $definition['#title'] ?? $this->convertKeyToLabel($key);
       $description = $definition['#description'] ?? NULL;

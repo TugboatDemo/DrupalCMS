@@ -10,14 +10,14 @@ use Drupal\eca\Plugin\ECA\Event\EventInterface;
 use Drupal\eca\PluginManager\Event as EventPluginManager;
 use Drupal\eca\Processor;
 use Drupal\eca\Token\TokenInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Unit tests for the ECA processor engine.
- *
- * @group eca
- * @group eca_core
  */
+#[Group('eca')]
+#[Group('eca_core')]
 class ProcessorTest extends EcaUnitTestBase {
 
   /**

@@ -3,10 +3,16 @@ type: Drupal CMS
 description: Sets up a nice administrative theme and navigation.
 install:
   - announcements_feed
+  - automatic_updates
+  - automatic_updates_extensions
   - coffee
   - contextual
   - dashboard
+  - dblog
+  # @todo Remove this when https://www.drupal.org/i/3557882 is released.
+  #   Remember to also clean up `composer.json`!
   - drupal_cms_helper
+  - drupical
   - file
   - gin
   - gin_login
@@ -14,10 +20,14 @@ install:
   - menu_link_content
   - menu_ui
   - navigation
+  - navigation_extra_tools
   - project_browser
   - sam
   - tagify
   - tagify_user_list
+  - update
+  - views_ui
+  - view_password
 config:
   strict: false
   import:
@@ -40,10 +50,26 @@ config:
       - block.block.claro_page_title
       - block.block.claro_primary_local_tasks
       - block.block.claro_secondary_local_tasks
+    user:
+      - views.view.user_admin_people
   actions:
     announcements_feed.settings:
       simpleConfigUpdate:
         limit: 2
+    automatic_updates.settings:
+      simpleConfigUpdate:
+        allow_core_minor_updates: true
+    core.menu.static_menu_link_overrides:
+      simpleConfigUpdate:
+        definitions.announcements_feed__announcement:
+          menu_name: admin
+          parent: system.admin
+          weight: 0
+          expanded: false
+          enabled: false
+    drupical.settings:
+      simpleConfigUpdate:
+        limit: 5
     gin_login.settings:
       simpleConfigUpdate:
         brand_image:
@@ -63,11 +89,38 @@ config:
           label: Dashboard
           label_display: '0'
           provider: dashboard
+        # Add a link to the Drupal CMS user guide.
+        sections.0.components.52e884dd-0301-4265-b2b3-9cea53a403f3:
+          uuid: 52e884dd-0301-4265-b2b3-9cea53a403f3
+          region: footer
+          configuration:
+            id: navigation_link
+            label: Help
+            label_display: '0'
+            provider: navigation
+            title: Help
+            uri: 'https://new.drupal.org/docs/drupal-cms'
+            icon_class: help
+          weight: -2
+          additional: []
+    project_browser.admin_settings:
+      simpleConfigUpdate:
+        allow_ui_install: true
+        max_selections: 1
     system.theme:
       simpleConfigUpdate:
         admin: gin
     tagify.settings:
       simpleConfigUpdate:
         set_default_widget: true
+    update.settings:
+      simpleConfigUpdate:
+        check.disabled_extensions: true
     user.role.authenticated:
-      grantPermission: 'access coffee'
+      grantPermissions:
+        - 'access administration pages'
+        - 'access coffee'
+        - 'access contextual links'
+        - 'access navigation'
+        - 'view the administration theme'
+        - 'view welcome dashboard'

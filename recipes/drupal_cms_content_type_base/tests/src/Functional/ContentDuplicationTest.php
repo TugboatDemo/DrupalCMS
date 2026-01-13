@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\drupal_cms_content_type_base\Functional;
 
-use Composer\InstalledVersions;
-use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\drupal_cms_content_type_base\Traits\ContentModelTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\TestWith;
 
 #[Group('drupal_cms_content_type_base')]
 #[IgnoreDeprecations]
 class ContentDuplicationTest extends BrowserTestBase {
 
-  use RecipeTestTrait;
+  use ContentModelTestTrait;
 
   /**
    * {@inheritdoc}
@@ -27,30 +25,22 @@ class ContentDuplicationTest extends BrowserTestBase {
    */
   protected static $modules = ['block'];
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
+  public function testContentDuplication(): void {
     $this->drupalPlaceBlock('page_title_block');
     $this->drupalPlaceBlock('local_tasks_block');
-  }
 
-  #[TestWith(['drupal/drupal_cms_blog', 'blog'])]
-  #[TestWith(['drupal/drupal_cms_case_study', 'case_study'])]
-  #[TestWith(['drupal/drupal_cms_events', 'event'])]
-  #[TestWith(['drupal/drupal_cms_news', 'news'])]
-  #[TestWith(['drupal/drupal_cms_page', 'page'])]
-  #[TestWith(['drupal/drupal_cms_person', 'person'])]
-  #[TestWith(['drupal/drupal_cms_project', 'project'])]
-  public function testContentDuplication(string $recipe_name, string $content_type): void {
-    $dir = InstalledVersions::getInstallPath($recipe_name);
-    $this->applyRecipe($dir);
+    // For performance, test all these content types in one test, rather than
+    // a data provider or #[TestWith] attributes.
+    $content_types = $this->applyAllContentTypeRecipes();
 
     $account = $this->drupalCreateUser();
     $account->addRole('content_editor')->save();
     $this->drupalLogin($account);
 
+    array_walk($content_types, $this->doTestContentDuplication(...));
+  }
+
+  private function doTestContentDuplication(string $content_type): void {
     $original_title = 'Fun Times';
     $interstitial_message = sprintf('You are duplicating "%s"', $original_title);
 

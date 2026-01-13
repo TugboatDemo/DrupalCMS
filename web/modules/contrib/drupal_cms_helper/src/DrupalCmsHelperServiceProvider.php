@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Drupal\drupal_cms_helper;
 
 use Drupal\Core\Database\Connection;
-use Drupal\Core\DefaultContent\PreExportEvent;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
-use Drupal\drupal_cms_helper\EventSubscriber\DefaultContentSubscriber;
 use PhpTuf\ComposerStager\API\Process\Service\ComposerProcessRunnerInterface;
 use PhpTuf\ComposerStager\API\Process\Service\RsyncProcessRunnerInterface;
 use Symfony\Component\DependencyInjection\Reference;
@@ -45,12 +43,6 @@ final class DrupalCmsHelperServiceProvider extends ServiceProviderBase {
           new Reference('.inner'),
           new Reference(Connection::class),
         ]);
-    }
-
-    if (isset($modules['canvas']) && class_exists(PreExportEvent::class)) {
-      $container->register(DefaultContentSubscriber::class)
-        ->setAutowired(TRUE)
-        ->addTag('event_subscriber');
     }
   }
 

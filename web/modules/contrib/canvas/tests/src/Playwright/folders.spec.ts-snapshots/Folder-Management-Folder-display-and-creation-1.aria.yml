@@ -1,8 +1,10 @@
 - tabpanel "Components":
-  - textbox "Search content"
+  - textbox "Search content":
+    - /placeholder: Search…
   - img
   - button "New":
     - img
+    - text: New
     - img
   - img
   - button "Atom/Media"
@@ -39,6 +41,9 @@
   - button "Collapse Container folder" [expanded]:
     - img
   - list:
+    - listitem:
+      - img
+      - text: Columns
     - listitem:
       - img
       - text: Grid Container
@@ -79,6 +84,9 @@
   - list:
     - listitem:
       - img
+      - text: Banner
+    - listitem:
+      - img
       - text: Call to Absolute Action
     - listitem:
       - img
@@ -88,10 +96,16 @@
       - text: /Canvas test SDC for sparkline \(>1 integers between -\d+ and \d+\)/
     - listitem:
       - img
+      - text: Canvas test SDC for tags
+    - listitem:
+      - img
       - text: "Canvas test SDC for testing type: `Drupal\\Core\\Template\\Attribute` special casing"
     - listitem:
       - img
       - text: Canvas test SDC that crashes when 'crash' prop is TRUE
+    - listitem:
+      - img
+      - text: Canvas test SDC with missing image $ref schema
     - listitem:
       - img
       - text: Canvas test SDC with optional image and heading
@@ -112,6 +126,9 @@
       - text: Canvas test SDC with required image, with example
     - listitem:
       - img
+      - text: Captioned video
+    - listitem:
+      - img
       - text: Card
     - listitem:
       - img
@@ -124,7 +141,14 @@
       - text: Card with stream wrapper image
     - listitem:
       - img
+      - text: Component mismatch meta:enum, but still operational thanks to https://www.drupal.org/i/3528998
+    - listitem:
+      - img
       - text: Component no meta:enum
+    - listitem:
+      - img
+      - text: Component using imports
+      - button "Open contextual menu"
     - listitem:
       - img
       - text: Druplicon
@@ -133,10 +157,42 @@
       - text: Hero
     - listitem:
       - img
+      - text: Interactive
+      - button "Open contextual menu"
+    - listitem:
+      - img
+      - text: My Code Component Link
+      - button "Open contextual menu"
+    - listitem:
+      - img
       - text: Section
     - listitem:
       - img
       - text: Test SDC Image
+    - listitem:
+      - img
+      - text: Using drupalSettings getSiteData
+      - button "Open contextual menu"
+    - listitem:
+      - img
+      - text: Vanilla Image
+      - button "Open contextual menu"
+    - listitem:
+      - img
+      - text: With enums
+      - button "Open contextual menu"
+    - listitem:
+      - img
+      - text: With no props
+      - button "Open contextual menu"
+    - listitem:
+      - img
+      - text: With props
+      - button "Open contextual menu"
+    - listitem:
+      - img
+      - text: With slot
+      - button "Open contextual menu"
   - img
   - button "Status"
   - button "Collapse Status folder" [expanded]:
@@ -165,44 +221,3 @@
     - listitem:
       - img
       - text: Site branding
-  - list:
-    - listitem:
-      - img
-      - text: Captioned video
-      - button "Open contextual menu"
-    - listitem:
-      - img
-      - text: Component using imports
-      - button "Open contextual menu"
-    - listitem:
-      - img
-      - text: Interactive
-      - button "Open contextual menu"
-    - listitem:
-      - img
-      - text: My Code Component Link
-      - button "Open contextual menu"
-    - listitem:
-      - img
-      - text: Using drupalSettings getSiteData
-      - button "Open contextual menu"
-    - listitem:
-      - img
-      - text: Vanilla Image
-      - button "Open contextual menu"
-    - listitem:
-      - img
-      - text: With enums
-      - button "Open contextual menu"
-    - listitem:
-      - img
-      - text: With no props
-      - button "Open contextual menu"
-    - listitem:
-      - img
-      - text: With props
-      - button "Open contextual menu"
-    - listitem:
-      - img
-      - text: With slot
-      - button "Open contextual menu"

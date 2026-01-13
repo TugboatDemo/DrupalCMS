@@ -2,23 +2,24 @@
 
 namespace Drupal\eca_render\Plugin\Block;
 
+use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\eca\Event\RenderEventInterface;
 use Drupal\eca\Event\TriggerEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * The ECA Block plugin.
- *
- * @Block(
- *   id = "eca",
- *   admin_label = @Translation("ECA Block"),
- *   category = @Translation("ECA"),
- *   deriver = "Drupal\eca_render\Plugin\Block\EcaBlockDeriver"
- * )
  */
+#[Block(
+  id: 'eca',
+  admin_label: new TranslatableMarkup('ECA Block'),
+  category: new TranslatableMarkup('ECA'),
+  deriver: EcaBlockDeriver::class
+)]
 final class EcaBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**

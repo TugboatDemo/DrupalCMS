@@ -311,6 +311,7 @@ class Api {
         ->condition('route_name', $dismissal["route_name"])
         ->condition('page_path', $dismissal["page_path"])
         ->condition('dismissal_status', "hide")
+        ->condition('element_id', $dismissal["element_id"])
         ->condition('uid', $this->account->id())
         ->execute();
       if ($this->account->hasPermission('mark as ok in editoria11y')) {
@@ -318,6 +319,7 @@ class Api {
         $this->connection->delete("editoria11y_dismissals")
           ->condition('route_name', $dismissal["route_name"])
           ->condition('page_path', $dismissal["page_path"])
+          ->condition('element_id', $dismissal["element_id"])
           ->condition('dismissal_status', "ok")
           ->execute();
       }
@@ -328,6 +330,18 @@ class Api {
       $this->validateNotNull($dismissal["result_key"]);
 
       $now = time();
+
+      $keys = [
+        'element_id' => $dismissal["element_id"],
+        'result_name' => $dismissal["result_name"],
+        'entity_type' => $dismissal["entity_type"],
+        'route_name' => $dismissal["route_name"],
+        'page_path' => $dismissal["page_path"],
+        'page_language' => $dismissal["language"],
+      ];
+      if ($operation === "hide") {
+        $keys['uid'] = $this->account->id();
+      }
 
       $this->connection->merge("editoria11y_dismissals")
         ->insertFields(
@@ -363,16 +377,7 @@ class Api {
                   'updated' => $now,
                 ]
             )
-        ->keys(
-                [
-                  'element_id' => $dismissal["element_id"],
-                  'result_name' => $dismissal["result_name"],
-                  'entity_type' => $dismissal["entity_type"],
-                  'route_name' => $dismissal["route_name"],
-                  'page_path' => $dismissal["page_path"],
-                  'page_language' => $dismissal["language"],
-                ]
-            )
+        ->keys($keys)
         ->execute();
     }
     // Clear cache for the referring page and dashboard.

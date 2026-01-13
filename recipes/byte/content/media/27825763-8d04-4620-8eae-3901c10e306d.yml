@@ -20,10 +20,10 @@ default:
       alias: null
   field_media_image:
     -
-      alt: 'A woman working on her laptop while leaning against a dark glass window.'
+      alt: 'Two men walking down a long, curved hallway lit in blueish purple.'
       title: ''
-      width: 454
-      height: 340
+      width: 1200
+      height: 675
       entity: 8eb1072e-2529-4517-8072-c671a5f1bc65
 _meta:
   version: '1.0'
