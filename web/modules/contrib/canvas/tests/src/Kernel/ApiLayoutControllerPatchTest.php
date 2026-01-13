@@ -7,6 +7,7 @@ namespace Drupal\Tests\canvas\Kernel;
 use Drupal\canvas\AutoSave\AutoSaveManager;
 use Drupal\canvas\Entity\ContentTemplate;
 use Drupal\canvas\Entity\PageRegion;
+use Drupal\canvas\Plugin\DataType\ComputedUrlWithQueryString;
 use Drupal\canvas\Plugin\Field\FieldType\ComponentTreeItem;
 use Drupal\canvas\Plugin\Field\FieldTypeOverride\ImageItemOverride;
 use Drupal\canvas\Storage\ComponentTreeLoader;
@@ -98,21 +99,9 @@ final class ApiLayoutControllerPatchTest extends ApiLayoutControllerTestBase {
         'component_id' => 'sdc.canvas_test_sdc.my-hero',
         'component_version' => 'a681ae184a8f6b7f',
         'inputs' => [
-          'heading' => [
-            'sourceType' => 'static:field_item:string',
-            'value' => 'hello, world!',
-            'expression' => 'ℹ︎string␟value',
-          ],
-          'subheading' => [
-            'sourceType' => 'static:field_item:string',
-            'value' => 'this is a subheading',
-            'expression' => 'ℹ︎string␟value',
-          ],
-          'cta1href' => [
-            'sourceType' => 'static:field_item:uri',
-            'value' => 'https://drupal.org',
-            'expression' => 'ℹ︎uri␟value',
-          ],
+          'heading' => 'hello, world!',
+          'subheading' => 'this is a subheading',
+          'cta1href' => ['uri' => 'https://drupal.org'],
         ],
       ],
       // Add a component with a pre-existing dynamic property source to ensure
@@ -415,8 +404,9 @@ final class ApiLayoutControllerPatchTest extends ApiLayoutControllerTestBase {
     \assert(is_string($fileUri));
     $image = $media->get('field_media_image')->get(0);
     \assert($image instanceof ImageItemOverride);
-    $image_url = $image->get('src_with_alternate_widths')->getValue();
-    self::assertEquals($image_url, $data['model'][CanvasTestSetup::UUID_STATIC_IMAGE]['resolved']['image']['src']);
+    $image_url = $image->get('src_with_alternate_widths');
+    self::assertInstanceOf(ComputedUrlWithQueryString::class, $image_url);
+    self::assertEquals($image_url->getValue()->getGeneratedUrl(), $data['model'][CanvasTestSetup::UUID_STATIC_IMAGE]['resolved']['image']['src']);
 
     self::assertFalse($autoSave->getAutoSaveEntity($entity)->isEmpty());
     foreach ($regions as $region) {
@@ -452,7 +442,7 @@ final class ApiLayoutControllerPatchTest extends ApiLayoutControllerTestBase {
     \assert($thumbnail instanceof ImageStyleInterface);
     self::assertCount(2, $images);
     self::assertEquals([
-      $image_url,
+      $image_url->getValue()->getGeneratedUrl(),
       $thumbnail->buildUrl($fileUri),
     ], $images);
 

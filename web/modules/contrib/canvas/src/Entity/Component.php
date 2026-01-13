@@ -6,6 +6,7 @@ namespace Drupal\canvas\Entity;
 
 use Drupal\canvas\Audit\RevisionAuditEnum;
 use Drupal\canvas\CanvasConfigUpdater;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
@@ -74,7 +75,6 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
     'source',
     'source_local_id',
     'provider',
-    'category',
     'active_version',
     'versioned_properties',
   ],
@@ -119,11 +119,6 @@ final class Component extends VersionedConfigEntityBase implements ComponentInte
   protected ?string $provider;
 
   /**
-   * The human-readable category of the component.
-   */
-  protected string|TranslatableMarkup|null $category;
-
-  /**
    * Holds the plugin collection for the source plugin.
    */
   protected ?VersionedConfigurationSubsetSingleLazyPluginCollection $sourcePluginCollection = NULL;
@@ -149,13 +144,6 @@ final class Component extends VersionedConfigEntityBase implements ComponentInte
    */
   public function id(): string {
     return $this->id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCategory(): string|TranslatableMarkup|null {
-    return $this->category;
   }
 
   /**
@@ -347,21 +335,25 @@ final class Component extends VersionedConfigEntityBase implements ComponentInte
     // Ensure a broken Component cannot break the Canvas HTTP API.
     else {
       try {
-        // Intentionally fail to render something.
-        $build = $this->getComponentSource()->renderComponent([], [], $component_config_entity_uuid, TRUE);
-        throw new \LogicException(sprintf("The %s ComponentSource plugin lied about the %s Component being broken: it did not crash during rendering.",
-          $source->getPluginId(),
-          $this->source_local_id,
-        ));
+        // Wrap in a render-safe container.
+        // If ::renderComponent() fails, it falls into "catch" block.
+        $build = [
+          '#type' => RenderSafeComponentContainer::PLUGIN_ID,
+          '#component' => $this->getComponentSource()->renderComponent([], [], $component_config_entity_uuid, TRUE),
+          '#component_context' => 'API',
+          '#component_uuid' => $component_config_entity_uuid,
+          '#is_preview' => TRUE,
+        ];
       }
       catch (\Throwable $e) {
         // … but some ComponentSources might even fail while calling
-        // ::renderComponent(), handle this too! (They might be calling
+        // ::renderComponent(), handle this too!
         $build = RenderSafeComponentContainer::handleComponentException(
           $e,
           componentContext: 'API',
           isPreview: TRUE,
           componentUuid: $component_config_entity_uuid,
+          component_exception_cacheability: CacheableMetadata::createFromObject($this),
         );
       }
       // Inform the UI this is IMPOSSIBLE to instantiate. The UI should render
@@ -597,6 +589,8 @@ final class Component extends VersionedConfigEntityBase implements ComponentInte
     if (!$this->isSyncing()) {
       $this->getConfigUpdater()->updatePropFieldDefinitionsWithRequiredFlag($this);
       $this->getConfigUpdater()->updatePropFieldDefinitionsUsingTextValue($this);
+      $this->getConfigUpdater()->updatePropOrder($this);
+      $this->getConfigUpdater()->unsetComponentCategoryProperty($this);
     }
     parent::preSave($storage);
 
@@ -634,12 +628,8 @@ final class Component extends VersionedConfigEntityBase implements ComponentInte
 
     // For new Components, auto-create Folders based on their category.
     if (!$update) {
-      $category = $this->getCategory();
+      $category = $this->getComponentSource()->determineDefaultFolder();
 
-      // If no category is set, there's no Folder to auto-create.
-      if ($category === NULL) {
-        return;
-      }
       $folder = Folder::loadByNameAndConfigEntityTypeId((string) $category, self::ENTITY_TYPE_ID);
       if (empty($folder)) {
         $folder = Folder::create([
@@ -657,10 +647,7 @@ final class Component extends VersionedConfigEntityBase implements ComponentInte
     // If the Component is deleted, remove it from the Folder it was in.
     foreach ($entities as $entity) {
       /** @var \Drupal\canvas\Entity\Component $entity */
-      $category = $entity->getCategory();
-      if ($category !== NULL) {
-        Folder::loadByNameAndConfigEntityTypeId((string) $category, self::ENTITY_TYPE_ID)?->removeItem($entity->id())?->save();
-      }
+      Folder::loadByItemAndConfigEntityTypeId((string) $entity->id(), self::ENTITY_TYPE_ID)?->removeItem($entity->id())?->save();
     }
     parent::preDelete($storage, $entities);
   }

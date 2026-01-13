@@ -2,17 +2,18 @@
 
 namespace Drupal\better_exposed_filters\Plugin\better_exposed_filters\filter;
 
+use Drupal\better_exposed_filters\Attribute\FiltersWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\better_exposed_filters\BetterExposedFiltersHelper;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Default widget implementation.
- *
- * @BetterExposedFiltersFilterWidget(
- *   id = "bef",
- *   label = @Translation("Checkboxes/Radio Buttons"),
- * )
  */
+#[FiltersWidget(
+  id: 'bef',
+  title: new TranslatableMarkup('Checkboxes/Radio Buttons'),
+)]
 class RadioButtons extends FilterWidgetBase {
 
   /**
@@ -23,6 +24,9 @@ class RadioButtons extends FilterWidgetBase {
       'select_all_none' => FALSE,
       'select_all_none_nested' => FALSE,
       'display_inline' => FALSE,
+      'soft_limit' => 0,
+      'soft_limit_label_less' => '',
+      'soft_limit_label_more' => '',
     ];
   }
 
@@ -61,6 +65,45 @@ class RadioButtons extends FilterWidgetBase {
       ),
     ];
 
+    $options = [50, 40, 30, 20, 15, 10, 5, 3];
+    $form['soft_limit'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Soft limit'),
+      '#default_value' => $this->configuration['soft_limit'] ?: 0,
+      '#options' => array_combine($options, $options),
+      '#empty_option' => $this->t('No limit'),
+      "#empty_value" => 0,
+      '#description' => $this->t('Limit the number of displayed items via JavaScript.'),
+    ];
+    $form['soft_limit_label_less'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Show less label'),
+      '#description' => $this->t('This text will be used for "Show less" link.'),
+      '#default_value' => $this->configuration['soft_limit_label_less'] ?: t('Show less'),
+      '#states' => [
+        'invisible' => [
+          ':input[name="exposed_form_options[bef][filter][' . $filter->field . '][configuration][soft_limit]"]' =>
+            [
+              'value' => 0,
+            ],
+        ],
+      ],
+    ];
+    $form['soft_limit_label_more'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Show more label'),
+      '#description' => $this->t('This text will be used for "Show more" link.'),
+      '#default_value' => $this->configuration['soft_limit_label_more'] ?: t('Show more'),
+      '#states' => [
+        'invisible' => [
+          ':input[name="exposed_form_options[bef][filter][' . $filter->field . '][configuration][soft_limit]"]' =>
+            [
+              'value' => 0,
+            ],
+        ],
+      ],
+    ];
+
     return $form;
   }
 
@@ -73,6 +116,28 @@ class RadioButtons extends FilterWidgetBase {
     // Form element is designated by the element ID which is user-
     // configurable.
     $field_id = $filter->options['is_grouped'] ? $filter->options['group_info']['identifier'] : $filter->options['expose']['identifier'];
+
+    $input = $form_state->getUserInput();
+    foreach ($input as $key => $value) {
+      if (is_array($value)) {
+        $value = array_filter($value, function ($item) {
+          return !($item === '' || $item === NULL || $item === 0 || $item === '0');
+        });
+
+        if (empty($value)) {
+          unset($input[$key]);
+        }
+        else {
+          $input[$key] = $value;
+        }
+      }
+      else {
+        if (is_null($value)) {
+          unset($input[$key]);
+        }
+      }
+    }
+    $form_state->setUserInput($input);
 
     parent::exposedFormAlter($form, $form_state);
     // If expose filters with operator enable.
@@ -142,6 +207,25 @@ class RadioButtons extends FilterWidgetBase {
         $form[$field_id]['#theme'] = 'bef_radios';
         $form[$field_id]['#type'] = 'radios';
       }
+    }
+
+    $soft_limit = (int) $this->configuration['soft_limit'];
+    if ($soft_limit !== 0) {
+      $form['#attached']['library'][] = 'better_exposed_filters/soft_limit';
+      $form['#attached']['drupalSettings']['better_exposed_filters']['soft_limit'][$field_id]['limit'] = $soft_limit;
+      $form['#attached']['drupalSettings']['better_exposed_filters']['soft_limit'][$field_id]['show_less'] = $this->configuration['soft_limit_label_less'];
+      $form['#attached']['drupalSettings']['better_exposed_filters']['soft_limit'][$field_id]['show_more'] = $this->configuration['soft_limit_label_more'];
+
+      $is_checkboxes = !empty($form[$field_id]['#multiple']);
+      $is_hierarchical = isset($filter->options["hierarchy"]) && $filter->options["hierarchy"];
+      $list_selector = $is_checkboxes ? '.bef-checkboxes' : '.form-radios';
+      $item_selector = $is_checkboxes ? '.js-form-type-checkbox' : '.js-form-type-radio';
+      if ($is_hierarchical) {
+        $list_selector = $list_selector . ' > ul';
+        $item_selector = ' > li';
+      }
+      $form['#attached']['drupalSettings']['better_exposed_filters']['soft_limit'][$field_id]['list_selector'] = $list_selector;
+      $form['#attached']['drupalSettings']['better_exposed_filters']['soft_limit'][$field_id]['item_selector'] = $item_selector;
     }
   }
 

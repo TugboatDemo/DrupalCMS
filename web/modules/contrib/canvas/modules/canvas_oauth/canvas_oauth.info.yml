@@ -7,7 +7,7 @@ dependencies:
   - canvas:canvas
   - simple_oauth:simple_oauth (>=6.0.0)
 
-# Information added by Drupal.org packaging script on 2025-11-14
-version: '1.0.0-rc4'
+# Information added by Drupal.org packaging script on 2026-01-12
+version: '1.0.3'
 project: 'canvas'
-datestamp: 1763149713
+datestamp: 1768261169

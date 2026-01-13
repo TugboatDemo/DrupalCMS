@@ -8,7 +8,7 @@ drupal/drupal_cms_accessibility_tools:
   title: 'Accessibility Tools'
   type: recipe
   logo: null
-  core: '^10.3 || ^11'
+  core: '^11.3'
   machineName: drupal_cms_accessibility_tools
   body:
     summary: 'Adds automated checks to help ensure content conforms to web accessibility guidelines.'
@@ -18,7 +18,7 @@ drupal/drupal_cms_ai:
   title: 'AI Assistant'
   type: recipe
   logo: null
-  core: ^11.1.4
+  core: '^11.3'
   machineName: drupal_cms_ai
   body:
     summary: 'Adds integration with AI services, such as alt text generation and a chat bot to assist with site building. Requires an API key from Open AI or Anthropic.'
@@ -28,7 +28,7 @@ drupal/drupal_cms_blog:
   title: Blog
   type: recipe
   logo: null
-  core: '^10.4 || ^11'
+  core: '^11.3'
   machineName: drupal_cms_blog
   body:
     summary: 'Adds a blog post content type and listing page.'
@@ -38,7 +38,7 @@ drupal/drupal_cms_case_study:
   title: 'Case Studies'
   type: recipe
   logo: null
-  core: '^10.4 || ^11'
+  core: '^11.3'
   machineName: drupal_cms_case_study
   body:
     summary: 'Adds a case study content type and listing page.'
@@ -48,7 +48,7 @@ drupal/drupal_cms_events:
   title: Events
   type: recipe
   logo: null
-  core: '^10.4 || ^11'
+  core: '^11.3'
   machineName: drupal_cms_events
   body:
     summary: 'Adds an event content type and listing page.'
@@ -58,7 +58,7 @@ drupal/drupal_cms_forms:
   title: Forms
   type: recipe
   logo: null
-  core: '^10.4 || ^11'
+  core: '^11.3'
   machineName: drupal_cms_forms
   body:
     summary: 'Adds a simple contact form, and tools for building forms.'
@@ -68,7 +68,7 @@ drupal/drupal_cms_google_analytics:
   title: 'Google Analytics'
   type: recipe
   logo: null
-  core: ^11.1.4
+  core: '^11.3'
   machineName: drupal_cms_google_analytics
   body:
     summary: 'Adds tracking of website traffic using Google Analytics and Google Tag Manager. Requires a Google Tag Manager ID.'
@@ -78,7 +78,7 @@ drupal/drupal_cms_news:
   title: News
   type: recipe
   logo: null
-  core: '^10.4 || ^11'
+  core: '^11.3'
   machineName: drupal_cms_news
   body:
     summary: 'Adds a news content type and listing page.'
@@ -88,7 +88,7 @@ drupal/drupal_cms_person:
   title: 'Person Profiles'
   type: recipe
   logo: null
-  core: '^10.4 || ^11'
+  core: '^11.3'
   machineName: drupal_cms_person
   body:
     summary: 'Adds a person profile content type.'
@@ -98,7 +98,7 @@ drupal/drupal_cms_project:
   title: Projects
   type: recipe
   logo: null
-  core: '^10.4 || ^11'
+  core: '^11.3'
   machineName: drupal_cms_project
   body:
     summary: 'Adds a project content type and listing page.'
@@ -108,7 +108,7 @@ drupal/drupal_cms_search:
   title: Search
   type: recipe
   logo: null
-  core: '^10.4 || ^11'
+  core: '^11.3'
   machineName: drupal_cms_search
   body:
     summary: 'Adds a search to help visitors find content.'
@@ -118,7 +118,7 @@ drupal/drupal_cms_seo_tools:
   title: 'SEO Tools'
   type: recipe
   logo: null
-  core: '^10.4 || ^11'
+  core: '^11.3'
   machineName: drupal_cms_seo_tools
   body:
     summary: 'Adds common search engine optimisation tools such as meta tags, XML sitemap, robots.txt management and more.'

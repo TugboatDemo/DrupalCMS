@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\drupal_cms_content_type_base\Traits;
 
+use Composer\InstalledVersions;
 use Drupal\Core\Entity\Display\EntityDisplayInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\file\FileInterface;
-use Drupal\layout_builder\Entity\LayoutEntityDisplayInterface;
+use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Assert;
 
@@ -20,6 +21,31 @@ use PHPUnit\Framework\Assert;
  *   tests. It should not be used in production code.
  */
 trait ContentModelTestTrait {
+
+  use RecipeTestTrait;
+
+  /**
+   * Applies all Drupal CMS content type recipes.
+   *
+   * @return string[]
+   *   The machine names of all content types that now exist.
+   */
+  protected function applyAllContentTypeRecipes(): array {
+    $recipes = [
+      'blog' => 'drupal/drupal_cms_blog',
+      'case_study' => 'drupal/drupal_cms_case_study',
+      'event' => 'drupal/drupal_cms_events',
+      'news' => 'drupal/drupal_cms_news',
+      'page' => 'drupal/drupal_cms_page',
+      'person' => 'drupal/drupal_cms_person',
+      'project' => 'drupal/drupal_cms_project',
+    ];
+    foreach ($recipes as $recipe) {
+      $recipe = InstalledVersions::getInstallPath($recipe);
+      $this->applyRecipe($recipe);
+    }
+    return array_keys($recipes);
+  }
 
   /**
    * Asserts generic things about a content type add/edit form.
@@ -67,44 +93,13 @@ trait ContentModelTestTrait {
    *   The weights of the display's components, keyed by name, and sorted.
    */
   protected function getComponentsInOrder(EntityDisplayInterface $display): array {
-    if ($display instanceof LayoutEntityDisplayInterface && $display->isLayoutBuilderEnabled()) {    $fields = [];
-      $components = [];
-
-      foreach ($display->getSections() as $index => $section) {
-        foreach ($section->getComponents() as $component) {
-          $plugin_id = $component->getPluginId();
-
-          if (str_starts_with($plugin_id, 'field_block:') || str_starts_with($plugin_id, 'extra_field_block:')) {
-            Assert::assertSame(3, substr_count($plugin_id, ':'), "Section component plugin ID '$plugin_id' should have exactly 4 parts.");
-            [,,, $name] = explode(':', $plugin_id);
-            $components[$name] = $component->getWeight() + ($index * 100);
-          }
-        }
-      }
-    }
-    else {
-      $components = $display->getComponents();
-      $components = array_combine(
-        array_keys($components),
-        array_column($components, 'weight'),
-      );
-    }
+    $components = $display->getComponents();
+    $components = array_combine(
+      array_keys($components),
+      array_column($components, 'weight'),
+    );
     asort($components);
     return $components;
-  }
-
-  /**
-   * Asserts that fields shared by multiple displays, are in the same order.
-   *
-   * @param \Drupal\Core\Entity\Display\EntityDisplayInterface ...$displays
-   *   A set of entity displays to compare.
-   */
-  protected function assertSharedFieldsInSameOrder(EntityDisplayInterface ...$displays): void {
-    $all_components = array_map($this->getComponentsInOrder(...), $displays);
-    $expected_order = array_keys(array_intersect_key(...$all_components));
-    foreach ($displays as $display) {
-      $this->assertFieldsInOrder($display, $expected_order);
-    }
   }
 
   /**
@@ -118,12 +113,13 @@ trait ContentModelTestTrait {
   protected function assertFieldsInOrder(EntityDisplayInterface $display, array $expected_order): void {
     $actual_order = array_keys($this->getComponentsInOrder($display));
 
+    $name = $display->getConfigDependencyName();
     $missing_fields = array_diff($expected_order, $actual_order);
-    Assert::assertEmpty($missing_fields, $display->getConfigDependencyName() . " is missing fields: " . implode(', ', $missing_fields));
+    Assert::assertEmpty($missing_fields, "$name is missing fields: " . implode(', ', $missing_fields));
 
     $actual_order = array_intersect($actual_order, $expected_order);
     $actual_order = array_values($actual_order);
-    Assert::assertSame($expected_order, $actual_order);
+    Assert::assertSame($expected_order, $actual_order, "$name is not in the expected order.");
   }
 
   protected function assertContentModel(array $content_model): void {

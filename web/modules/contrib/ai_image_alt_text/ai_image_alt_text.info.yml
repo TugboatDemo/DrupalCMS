@@ -9,7 +9,7 @@ dependencies:
   - drupal:image
   - ai:ai
 
-# Information added by Drupal.org packaging script on 2025-02-05
-version: '1.0.1'
+# Information added by Drupal.org packaging script on 2025-12-05
+version: '1.0.2'
 project: 'ai_image_alt_text'
-datestamp: 1738761809
+datestamp: 1764942109

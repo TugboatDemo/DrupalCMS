@@ -34,6 +34,16 @@ drupal/drupal_cms_google_analytics:
     summary: 'Adds tracking of website traffic using Google Analytics and Google Tag Manager. Requires a Google Tag Manager ID.'
   packageName: drupal/drupal_cms_google_analytics
 
+drupal/mailchimp_signup_forms:
+  title: 'Mailchimp'
+  type: recipe
+  logo: null
+  core: '>=11.2'
+  machineName: mailchimp_signup_forms
+  body:
+    summary: 'Adds integration with Mailchimp, creating signup forms for each audience. Requires authentication with Mailchimp.'
+  packageName: drupal/mailchimp_signup_forms
+
 drupal/drupal_cms_search:
   title: Search
   type: recipe

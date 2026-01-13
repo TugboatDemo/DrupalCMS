@@ -2,18 +2,19 @@
 
 namespace Drupal\better_exposed_filters\Plugin\better_exposed_filters\filter;
 
+use Drupal\better_exposed_filters\Attribute\FiltersWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Date picker widget implementation.
- *
- * @BetterExposedFiltersFilterWidget(
- *   id = "bef_datepicker",
- *   label = @Translation("Date Picker"),
- * )
  */
+#[FiltersWidget(
+  id: 'bef_datepicker',
+  title: new TranslatableMarkup('Date Picker'),
+)]
 class DatePickers extends FilterWidgetBase {
 
   use LoggerChannelTrait;

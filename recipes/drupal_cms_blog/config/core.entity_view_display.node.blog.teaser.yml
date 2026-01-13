@@ -9,12 +9,8 @@ dependencies:
     - field.field.node.blog.field_tags
     - node.type.blog
   module:
-    - layout_builder
     - user
-third_party_settings:
-  layout_builder:
-    enabled: false
-    allow_custom: false
+third_party_settings: {  }
 id: node.blog.teaser
 targetEntityType: node
 bundle: blog

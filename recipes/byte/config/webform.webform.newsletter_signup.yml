@@ -133,7 +133,7 @@ settings:
   confirmation_title: Thanks!
   confirmation_message: '<p>Thanks for joining our list!</p>'
   confirmation_attributes: {  }
-  confirmation_back: true
+  confirmation_back: false
   confirmation_back_label: ''
   confirmation_back_attributes: {  }
   confirmation_exclude_query: false

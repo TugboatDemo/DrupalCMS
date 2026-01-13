@@ -4,13 +4,13 @@ namespace Drupal\Tests\eca_render\Kernel;
 
 use Drupal\eca_test_render_basics\Event\BasicRenderEvent;
 use Drupal\eca_test_render_basics\RenderBasicsEvents;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests regarding ECA render GetFileContents action.
- *
- * @group eca
- * @group eca_render
  */
+#[Group('eca')]
+#[Group('eca_render')]
 class GetFileContentsTest extends RenderActionsTestBase {
 
   /**

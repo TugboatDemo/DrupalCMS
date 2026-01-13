@@ -101,7 +101,7 @@ display:
           admin_label: ''
           plugin_id: text_custom
           empty: true
-          content: "There are currently no accessibility alerts. Only discovered alerts are listed here.\r\nPlease browse your content with Editoria11y enabled to discover alerts."
+          content: "There are currently no accessibility alerts. Only discovered alerts are listed here.\r\nBrowse your content with Editoria11y enabled to discover alerts."
           tokenize: false
       sorts: {  }
       arguments: {  }

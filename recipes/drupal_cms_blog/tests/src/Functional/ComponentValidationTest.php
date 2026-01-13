@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\drupal_cms_blog\Functional;
 
+use Composer\InstalledVersions;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\drupal_cms_content_type_base\Traits\ContentModelTestTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,31 +17,19 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 class ComponentValidationTest extends BrowserTestBase {
 
   use ContentModelTestTrait;
-  use RecipeTestTrait;
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
+  public function testBlogContentType(): void {
     $dir = realpath(__DIR__ . '/../../..');
     // The recipe should apply cleanly.
     $this->applyRecipe($dir);
     // Apply it again to prove that it is idempotent.
     $this->applyRecipe($dir);
-  }
 
-  public function testEditForm(): void {
-    $this->assertEditForm('blog');
-  }
-
-  public function testContentModel(): void {
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = $this->container->get(EntityDisplayRepositoryInterface::class);
 
@@ -55,6 +43,12 @@ class ComponentValidationTest extends BrowserTestBase {
       'field_content',
       'field_tags',
     ]);
+    $this->assertFieldsInOrder($form_display, [
+      'publish_on',
+      'publish_state',
+      'unpublish_on',
+      'unpublish_state',
+    ]);
 
     $default_display = $display_repository->getViewDisplay('node', 'blog');
     $this->assertNull($default_display->getComponent('links'));
@@ -64,7 +58,11 @@ class ComponentValidationTest extends BrowserTestBase {
       'field_content',
       'field_tags',
     ]);
-    $this->assertSharedFieldsInSameOrder($form_display, $default_display);
+    $this->assertFieldsInOrder($form_display, [
+      'field_featured_image',
+      'field_content',
+      'field_tags',
+    ]);
 
     $card_display = $display_repository->getViewDisplay('node', 'blog', 'card');
     $this->assertNull($card_display->getComponent('links'));
@@ -131,10 +129,9 @@ class ComponentValidationTest extends BrowserTestBase {
         ],
       ],
     ]);
-  }
+    $this->assertEditForm('blog');
 
-  public function testPathAliasPatternPrecedence(): void {
-    $dir = realpath(__DIR__ . '/../../../../drupal_cms_seo_basic');
+    $dir = InstalledVersions::getInstallPath('drupal/drupal_cms_seo_basic');
     $this->applyRecipe($dir);
 
     // Confirm that blog posts have the expected path aliases.

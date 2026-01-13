@@ -103,6 +103,33 @@ class TrashServiceProvider extends ServiceProviderBase {
         ->setClass(TrashWseMenuTreeStorage::class)
         ->addMethodCall('setTrashManager', [new Reference('trash.manager')]);
     }
+
+    // Ensure the trash ignore subscriber is one of the first definitions used
+    // after authentication. This is necessary because in the event that two
+    // subscriber event listeners have the same priority, then the one which was
+    // registered first takes precedence. We must ensure that the ignore
+    // subscriber is one of the first subscribers with a priority of 299.
+    $trash_ignore_subscriber = 'trash.ignore_subscriber';
+
+    // This is one of the earliest 'kernel.request' event listeners with a
+    // priority of 299, so we must ensure the ignore subscriber is added
+    // before it.
+    $target = 'system.timezone_resolver';
+
+    if ($container->hasDefinition($trash_ignore_subscriber) && $container->hasDefinition($target)) {
+      $definitions = $container->getDefinitions();
+      // Move 'trash.ignore_subscriber' before 'system.timezone_resolver' so it
+      // runs first among priority-299 'kernel.request' listeners.
+      $trash_definition = [$trash_ignore_subscriber => $definitions[$trash_ignore_subscriber]];
+      unset($definitions[$trash_ignore_subscriber]);
+      $pos = array_search($target, array_keys($definitions), TRUE);
+      assert(is_int($pos));
+      $container->setDefinitions(
+        array_slice($definitions, 0, $pos, TRUE) +
+        $trash_definition +
+        array_slice($definitions, $pos, NULL, TRUE)
+      );
+    }
   }
 
 }

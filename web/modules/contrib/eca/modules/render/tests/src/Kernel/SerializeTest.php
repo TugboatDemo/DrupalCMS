@@ -5,13 +5,13 @@ namespace Drupal\Tests\eca_render\Kernel;
 use Drupal\eca_test_render_basics\Event\BasicRenderEvent;
 use Drupal\eca_test_render_basics\RenderBasicsEvents;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests regarding ECA render Serialize action.
- *
- * @group eca
- * @group eca_render
  */
+#[Group('eca')]
+#[Group('eca_render')]
 class SerializeTest extends RenderActionsTestBase {
 
   /**

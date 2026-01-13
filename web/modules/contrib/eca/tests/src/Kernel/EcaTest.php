@@ -5,13 +5,13 @@ namespace Drupal\Tests\eca\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\modeler_api\Api;
 use Drupal\modeler_api\Component;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for ECA-extended Token replacement behavior.
- *
- * @group eca
- * @group eca_core
  */
+#[Group('eca')]
+#[Group('eca_core')]
 class EcaTest extends KernelTestBase {
 
   /**

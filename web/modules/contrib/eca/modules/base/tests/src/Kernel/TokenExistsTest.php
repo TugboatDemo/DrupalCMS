@@ -7,13 +7,13 @@ use Drupal\eca\Plugin\DataType\DataTransferObject;
 use Drupal\eca\PluginManager\Condition;
 use Drupal\eca\Token\TokenInterface;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests for the "eca_token_exists" condition plugin.
- *
- * @group eca
- * @group eca_base
  */
+#[Group('eca')]
+#[Group('eca_base')]
 class TokenExistsTest extends KernelTestBase {
 
   /**

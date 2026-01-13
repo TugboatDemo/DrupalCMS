@@ -6,13 +6,13 @@ use Drupal\eca_test_render_basics\Event\BasicRenderEvent;
 use Drupal\eca_test_render_basics\RenderBasicsEvents;
 use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests regarding ECA render EntityViewField action.
- *
- * @group eca
- * @group eca_render
  */
+#[Group('eca')]
+#[Group('eca_render')]
 class EntityViewFieldTest extends RenderActionsTestBase {
 
   /**

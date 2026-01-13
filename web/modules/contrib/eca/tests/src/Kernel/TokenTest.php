@@ -11,13 +11,13 @@ use Drupal\eca\Plugin\DataType\DataTransferObject;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\eca\ContentTypeCreationTrait;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for ECA-extended Token replacement behavior.
- *
- * @group eca
- * @group eca_core
  */
+#[Group('eca')]
+#[Group('eca_core')]
 class TokenTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;

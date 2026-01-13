@@ -4,11 +4,13 @@ namespace Drupal\eca\Entity;
 
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\eca\Entity\Objects\EcaAction;
 use Drupal\eca\Entity\Objects\EcaEvent;
 use Drupal\eca\Entity\Objects\EcaGateway;
@@ -18,40 +20,39 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Defines the ECA entity type.
- *
- * @ConfigEntityType(
- *   id = "eca",
- *   label = @Translation("ECA"),
- *   label_collection = @Translation("ECAs"),
- *   label_singular = @Translation("ECA"),
- *   label_plural = @Translation("ECAs"),
- *   label_count = @PluralTranslation(
- *     singular = "@count ECA",
- *     plural = "@count ECAs",
- *   ),
- *   handlers = {
- *     "storage" = "Drupal\eca\Entity\EcaStorage",
- *   },
- *   config_prefix = "eca",
- *   admin_permission = "administer eca",
- *   entity_keys = {
- *     "id" = "id",
- *     "uuid" = "uuid",
- *     "status" = "status",
- *     "weight" = "weight"
- *   },
- *   config_export = {
- *     "id",
- *     "uuid",
- *     "status",
- *     "weight",
- *     "events",
- *     "conditions",
- *     "gateways",
- *     "actions"
- *   }
- * )
  */
+#[ConfigEntityType(
+  id: 'eca',
+  label: new TranslatableMarkup('ECA'),
+  label_collection: new TranslatableMarkup('ECAs'),
+  label_singular: new TranslatableMarkup('ECA'),
+  label_plural: new TranslatableMarkup('ECAs'),
+  config_prefix: 'eca',
+  entity_keys: [
+    'id' => 'id',
+    'uuid' => 'uuid',
+    'status' => 'status',
+    'weight' => 'weight',
+  ],
+  handlers: [
+    'storage' => 'Drupal\eca\Entity\EcaStorage',
+  ],
+  admin_permission: 'administer eca',
+  label_count: [
+    'singular' => '@count ECA',
+    'plural' => '@count ECAs',
+  ],
+  config_export: [
+    'id',
+    'uuid',
+    'status',
+    'weight',
+    'events',
+    'conditions',
+    'gateways',
+    'actions',
+  ]
+)]
 class Eca extends ConfigEntityBase implements EntityWithPluginCollectionInterface {
 
   use EcaTrait;

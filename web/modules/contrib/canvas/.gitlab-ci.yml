@@ -39,7 +39,7 @@ include:
     # - Minor or Major latests - `ref: 1.x-latest` or `ref: 1.0.x-latest` - Get the latest additions within a minor (mostly bugfixes) or major (bugs and new features).
     # - Fixed tag - `ref: 1.0.1` - Set the value to a known tag. This will not get any updates.
     # If you change the default value of ref, you should set the _CURL_TEMPLATES_REF variable in the variables section to be the same as set here.
-    ref: $_GITLAB_TEMPLATES_REF
+    ref: 1.12.x-latest
     file:
       - "/includes/include.drupalci.main.yml"
       # For Drupal 7, remove the above line and uncomment the below.
@@ -66,6 +66,8 @@ stages:
 # Docs at https://git.drupalcode.org/project/gitlab_templates/-/blob/main/includes/include.drupalci.variables.yml
 ################
 variables:
+  # This needs to match $_GITLAB_TEMPLATES_REPO `ref`. Omit if `ref` value is `_GITLAB_TEMPLATES_REF`.
+  _CURL_TEMPLATES_REF: 1.12.x-latest
   # Show env variables always to help with debugging.
   _SHOW_ENVIRONMENT_VARIABLES: 1
 
@@ -81,6 +83,9 @@ variables:
   CI_PARENT_PROJECT_NAME: canvas
   PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: 0
   _CONCURRENCY_THREADS: '12'
+
+  # Enable testing against next minor version of Drupal core
+  OPT_IN_TEST_NEXT_MINOR: '1'
 
   # Enable Canvas contributors to change this from `true` to `false` to disable E2E (end-to-end) tests.
   # (Useful when early in an MR and/or developing low-level functionality that is unlikely to affect E2E tests.)
@@ -161,6 +166,14 @@ composer-lint:
   rules:
     - when: never
 
+phpstan (next minor):
+  rules:
+    - when: never
+
+phpunit (next minor):
+  rules:
+    - when: never
+
 phpcs-rules-match-drupal-11:
   stage: development
   script:
@@ -224,6 +237,9 @@ phpunit:
   variables:
     # Note: Canvas uses `@group #slow` to start slow tests early. The threshold is (at the time of writing) ~60 seconds.
     _PHPUNIT_CONCURRENT: 1
+    # 💡To run a single PHPUnit test, e.g. PropSourceTest, comment the above and uncomment the below.
+    # _PHPUNIT_CONCURRENT: 0
+    # _PHPUNIT_EXTRA: '--filter PropSourceTest'
   needs:
     - composer
     - UI
@@ -254,6 +270,40 @@ phpunit:
   image:
     name: $_CONFIG_DOCKERHUB_ROOT/php-$PHP_VERSION-ubuntu-apache:$_TARGET_PHP_IMAGE_TAG
   # @todo Remove when https://www.drupal.org/project/gitlab_templates/issues/3452183 lands.
+  rules:
+    - *is-push-rule
+    - *php-files-change-rule
+    - *module-metadata-files-change-rule
+    - *module-config-files-change-rule
+    - *SDC-files-change-rule
+    - *UI-fixtures-files-change-rule
+    - *manual-rule
+
+# Canvas requires 11.2, but may provide >11.2-only features.
+phpunit (>11.2-only features):
+  extends: phpunit
+  needs:
+    - composer (next minor)
+    - UI
+  variables:
+    _PHPUNIT_TESTGROUPS: ''
+    _PHPUNIT_CONCURRENT: 0
+    _PHPUNIT_EXTRA: '--filter DefaultContentExportImportTest'
+  parallel:
+    matrix:
+      - _TARGET_DB_TYPE: sqlite
+        _TARGET_DB_VERSION: '3'
+        _TARGET_PHP: '8.3-ubuntu'
+        _FOR_EVERY_MR_COMMIT: 'true'
+      - _TARGET_DB_TYPE: 'mariadb'
+        _TARGET_DB_VERSION: '10.6'
+        _FOR_EVERY_MR_COMMIT: 'false'
+      - _TARGET_DB_TYPE: 'mysql'
+        _TARGET_DB_VERSION: '8'
+        _FOR_EVERY_MR_COMMIT: 'false'
+      - _TARGET_DB_TYPE: 'pgsql'
+        _TARGET_DB_VERSION: '16'
+        _FOR_EVERY_MR_COMMIT: 'false'
   rules:
     - *is-push-rule
     - *php-files-change-rule
@@ -400,7 +450,7 @@ vitest:
     #
     # 👆
     #
-    - cd modules/custom/$CI_PROJECT_NAME
+    - cd $DRUPAL_PROJECT_FOLDER
     - echo -e "\e[0Ksection_start:`date +%s`:Cypress-install[collapsed=true]\r\e[0KInstall Cypress."
     - cp ./ui/.env.example ./ui/.env
     - echo "BASE_URL='${SIMPLETEST_BASE_URL}'" >> ./ui/.env
@@ -571,8 +621,6 @@ CLI Test:
   variables:
     GIT_DEPTH: 1
     _TARGET_DB_TYPE: sqlite
-    # Right now CORE_STABLE is 11.2.5, we need #3553664 in 11.2.6.
-    DRUPAL_CORE: 11.2.7
     TEST_CANVAS_CLIENT_ID: cli
     TEST_CANVAS_CLIENT_SECRET: secret
     DRUPAL_TEST_WEBSERVER_USER: www-data

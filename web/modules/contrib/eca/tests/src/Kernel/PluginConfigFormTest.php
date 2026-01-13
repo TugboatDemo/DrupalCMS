@@ -7,14 +7,14 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\eca\Plugin\Action\ActionInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 
 /**
  * Tests for config forms of ECA plugins.
- *
- * @group eca
- * @group eca_core
  */
+#[Group('eca')]
+#[Group('eca_core')]
 class PluginConfigFormTest extends KernelTestBase {
 
   /**

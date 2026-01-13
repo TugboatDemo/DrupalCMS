@@ -21,6 +21,8 @@ use Drupal\Core\Url;
 use Drupal\trash\Handler\TrashHandlerInterface;
 use Drupal\trash\TrashEntityPurger;
 use Drupal\trash\TrashManagerInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Various hook implementations for Trash.
@@ -52,6 +54,10 @@ class TrashHooks {
 
     if (!($is_entity_delete_form || $is_entity_multiple_delete_form || $is_vbo_confirm_action_form)) {
       return;
+    }
+
+    if ($this->trashManager->getTrashContext() !== 'active') {
+      throw new HttpException(Response::HTTP_NOT_ACCEPTABLE, 'Delete operations are not allowed outside a Trash context.');
     }
 
     $entity_type = $bundle = $entity = NULL;

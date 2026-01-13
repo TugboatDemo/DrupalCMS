@@ -2,6 +2,7 @@
 
 namespace Drupal\eca_config\Plugin\Action;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Entity\EntityInterface;
@@ -98,11 +99,38 @@ class ConfigWrite extends ConfigActionBase {
     }
     $entity_type_id = $this->getConfigManager()->getEntityTypeIdByName($config_name);
     if ($entity_type_id !== NULL) {
-      if ($config_key !== '') {
-        $config_value = [$config_key => $config_value];
-      }
       /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface|null $config */
       $config = $this->getConfigManager()->loadConfigEntityByName($config_name);
+
+      if ($config_key !== '') {
+        $key_parts = explode('.', $config_key);
+        if (count($key_parts) > 1) {
+          // Handle nested keys.
+          // Get the top-level property.
+          $top_level_key = $key_parts[0];
+
+          if ($config !== NULL) {
+            // Get existing value to merge with.
+            $existing = $config->get($top_level_key);
+            if (!is_array($existing)) {
+              $existing = [];
+            }
+          }
+          else {
+            $existing = [];
+          }
+
+          // Set nested value using NestedArray.
+          $nested_parts = array_slice($key_parts, 1);
+          NestedArray::setValue($existing, $nested_parts, $config_value);
+          $config_value = [$top_level_key => $existing];
+        }
+        else {
+          // Single-level key.
+          $config_value = [$config_key => $config_value];
+        }
+      }
+
       if ($config === NULL) {
         $config = $this->entityTypeManager->getStorage($entity_type_id)->create($config_value);
       }

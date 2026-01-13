@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\trash\Kernel;
 
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\workspaces\Kernel\WorkspaceTestTrait;
 use Drupal\trash\EntityQuery\Workspaces\QueryFactory;
 use Drupal\workspaces\Entity\Workspace;
@@ -22,11 +23,6 @@ class TrashWorkspacesTest extends TrashKernelTestBase {
   protected static $modules = [
     'workspaces',
   ];
-
-  /**
-   * The entity type manager.
-   */
-  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * {@inheritdoc}

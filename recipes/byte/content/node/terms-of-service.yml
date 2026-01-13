@@ -10,16 +10,7 @@ default:
       target_id: 1
   title:
     -
-      value: 'Terms of Service'
-  created:
-    -
-      value: 1755631022
-  promote:
-    -
-      value: true
-  sticky:
-    -
-      value: false
+      value: 'Terms of service'
   revision_translation_affected:
     -
       value: true

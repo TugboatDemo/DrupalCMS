@@ -67,6 +67,7 @@ class TrashRedirectTest extends TrashKernelTestBase {
     $this->assertCount(1, $found);
 
     $new_redirect = reset($found);
+    assert($new_redirect instanceof Redirect);
     $this->assertEquals('/user', $new_redirect->getRedirectUrl()->toString());
 
     // Check that restoring the original redirect is not possible.

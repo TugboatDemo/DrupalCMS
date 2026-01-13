@@ -187,6 +187,8 @@ phpcs-rules-match-drupal-11:
 ################
 phpstan:
   allow_failure: false
+phpstan (next minor):
+  allow_failure: true
 
 ################
 # We want to run standard eslint for /js directory, but not /sveltejs directory.

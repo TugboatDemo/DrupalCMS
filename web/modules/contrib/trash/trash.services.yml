@@ -35,7 +35,7 @@ services:
 
   trash.route_processor:
     class: Drupal\trash\RouteProcessor\TrashRouteProcessor
-    arguments: ['@request_stack', '@current_route_match']
+    autowire: true
     tags:
       - { name: route_processor_outbound }
 

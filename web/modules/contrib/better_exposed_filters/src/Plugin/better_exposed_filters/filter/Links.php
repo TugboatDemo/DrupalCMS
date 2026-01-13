@@ -2,17 +2,18 @@
 
 namespace Drupal\better_exposed_filters\Plugin\better_exposed_filters\filter;
 
+use Drupal\better_exposed_filters\Attribute\FiltersWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\better_exposed_filters\BetterExposedFiltersHelper;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Default widget implementation.
- *
- * @BetterExposedFiltersFilterWidget(
- *   id = "bef_links",
- *   label = @Translation("Links"),
- * )
  */
+#[FiltersWidget(
+  id: 'bef_links',
+  title: new TranslatableMarkup('Links'),
+)]
 class Links extends FilterWidgetBase {
 
   /**
@@ -21,6 +22,9 @@ class Links extends FilterWidgetBase {
   public function defaultConfiguration(): array {
     return parent::defaultConfiguration() + [
       'select_all_none' => FALSE,
+      'soft_limit' => 0,
+      'soft_limit_label_less' => '',
+      'soft_limit_label_more' => '',
     ];
   }
 
@@ -42,6 +46,45 @@ class Links extends FilterWidgetBase {
       ),
     ];
 
+    $options = [50, 40, 30, 20, 15, 10, 5, 3];
+    $form['soft_limit'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Soft limit'),
+      '#default_value' => $this->configuration['soft_limit'] ?: 0,
+      '#options' => array_combine($options, $options),
+      '#empty_option' => $this->t('No limit'),
+      "#empty_value" => 0,
+      '#description' => $this->t('Limit the number of displayed items via JavaScript.'),
+    ];
+    $form['soft_limit_label_less'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Show less label'),
+      '#description' => $this->t('This text will be used for "Show less" link.'),
+      '#default_value' => $this->configuration['soft_limit_label_less'] ?: t('Show less'),
+      '#states' => [
+        'invisible' => [
+          ':input[name="exposed_form_options[bef][filter][' . $filter->field . '][configuration][soft_limit]"]' =>
+            [
+              'value' => 0,
+            ],
+        ],
+      ],
+    ];
+    $form['soft_limit_label_more'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Show more label'),
+      '#description' => $this->t('This text will be used for "Show more" link.'),
+      '#default_value' => $this->configuration['soft_limit_label_more'] ?: t('Show more'),
+      '#states' => [
+        'invisible' => [
+          ':input[name="exposed_form_options[bef][filter][' . $filter->field . '][configuration][soft_limit]"]' =>
+            [
+              'value' => 0,
+            ],
+        ],
+      ],
+    ];
+
     return $form;
   }
 
@@ -55,11 +98,9 @@ class Links extends FilterWidgetBase {
 
     parent::exposedFormAlter($form, $form_state);
 
-    if (!empty($form[$field_id])) {
+    if (!empty($form[$field_id]['#options'])) {
       // Clean up filters that pass objects as options instead of strings.
-      if (!empty($form[$field_id]['#options'])) {
-        $form[$field_id]['#options'] = BetterExposedFiltersHelper::flattenOptions($form[$field_id]['#options']);
-      }
+      $form[$field_id]['#options'] = BetterExposedFiltersHelper::flattenOptions($form[$field_id]['#options']);
 
       // Support rendering hierarchical links (e.g. taxonomy terms).
       if (!empty($filter->options['hierarchy'])) {
@@ -77,6 +118,16 @@ class Links extends FilterWidgetBase {
         $form[$field_id]['#attributes']['class'][] = 'bef-links-use-ajax';
         $form['#attached']['library'][] = 'better_exposed_filters/links_use_ajax';
       }
+    }
+
+    $soft_limit = (int) $this->configuration['soft_limit'];
+    if ($soft_limit !== 0) {
+      $form['#attached']['library'][] = 'better_exposed_filters/soft_limit';
+      $form['#attached']['drupalSettings']['better_exposed_filters']['soft_limit'][$field_id]['limit'] = $soft_limit;
+      $form['#attached']['drupalSettings']['better_exposed_filters']['soft_limit'][$field_id]['list_selector'] = '> ul';
+      $form['#attached']['drupalSettings']['better_exposed_filters']['soft_limit'][$field_id]['item_selector'] = '> li';
+      $form['#attached']['drupalSettings']['better_exposed_filters']['soft_limit'][$field_id]['show_less'] = $this->configuration['soft_limit_label_less'];
+      $form['#attached']['drupalSettings']['better_exposed_filters']['soft_limit'][$field_id]['show_more'] = $this->configuration['soft_limit_label_more'];
     }
   }
 

@@ -2,13 +2,13 @@
 
 namespace Drupal\eca_render\Element;
 
+use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 
 /**
  * Provides a lazy render element, for being built up via ECA.
- *
- * @RenderElement("eca_lazy")
  */
+#[RenderElement('eca_lazy')]
 class EcaLazy extends RenderElementBase {
 
   /**

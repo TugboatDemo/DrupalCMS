@@ -31,11 +31,15 @@ class ComponentValidationTest extends BrowserTestBase {
 
     $assert_session = $this->assertSession();
 
-    // A 403 should redirect to the login page, forwarding to the original
+    // A 403 should fully redirect to the login page, forwarding to the original
     // destination.
     $this->drupalGet('/admin');
-    $assert_session->statusCodeEquals(403);
+    $assert_session->statusCodeEquals(200);
     $assert_session->hiddenFieldValueEquals('form_id', 'user_login_form');
+    $query_string = parse_url($this->getUrl(), PHP_URL_QUERY);
+    $query = [];
+    parse_str($query_string, $query);
+    $this->assertStringEndsWith('/admin', $query['destination']);
     $assert_session->buttonExists('Log in');
 
     // We should be able to log in with our email address. Upon logging out, we

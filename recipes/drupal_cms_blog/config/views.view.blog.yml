@@ -300,7 +300,7 @@ display:
           replica: false
           query_tags: {  }
       relationships: {  }
-      use_ajax: true
+      use_ajax: false
       header: {  }
       footer: {  }
       display_extenders: {  }
@@ -541,10 +541,12 @@ display:
         groups:
           1: AND
       defaults:
+        use_ajax: false
         exposed_form: false
         filters: false
         filter_groups: false
         header: false
+      use_ajax: true
       display_description: ''
       header: {  }
       display_extenders: {  }

@@ -519,9 +519,7 @@ class EntityMatcher extends ConfigurableMatcherBase {
    *   The status for this entity.
    */
   protected function buildStatus(EntityInterface $entity) {
-    $entity_type = $entity->getEntityTypeId();
     if ($entity->getEntityType()->hasKey('status')) {
-      $entity = $this->entityTypeManager->getStorage($entity_type)->load($entity->id());
       return $entity->isPublished() ? 'published' : 'unpublished';
     }
     return '';

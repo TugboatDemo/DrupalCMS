@@ -55,32 +55,24 @@ test.describe('Perform CRUD operations on components', () => {
     await canvasEditor.goToEditor();
     await expect(page.locator('[data-testid="canvas-side-menu"]'))
       .toMatchAriaSnapshot(`
-        - button "Add":
+        - button "Library":
           - img
         - button "Layers":
           - img
         - separator
-        - button "Manage library":
+        - button "Code":
           - img
       `);
-    await page
-      .locator('[data-testid="canvas-side-menu"]')
-      .locator('[aria-label="Add"]')
-      .click();
-    await expect(
-      page.locator(
-        '[data-testid="canvas-primary-panel"] h4:has-text("Library")',
-      ),
-    ).toBeVisible();
-    const collapsedButtons = page.locator(
-      '[data-testid="canvas-primary-panel"] button[aria-expanded="false"]',
-    );
+    await canvasEditor.openLibraryPanel();
+
+    const collapsedFolderButtonsSelector =
+      '[data-testid="canvas-primary-panel"] button[aria-label^="Expand"][aria-label$="folder"]';
+
+    const collapsedButtons = page.locator(collapsedFolderButtonsSelector);
     const buttonCount = await collapsedButtons.count();
     for (let i = 0; i < buttonCount; i++) {
       const collapsedButton = page
-        .locator(
-          '[data-testid="canvas-primary-panel"] button[aria-expanded="false"]',
-        )
+        .locator(collapsedFolderButtonsSelector)
         .first();
       await collapsedButton.click();
     }
@@ -161,6 +153,36 @@ test.describe('Perform CRUD operations on components', () => {
         '[data-testid="canvas-contextual-panel"] [data-drupal-selector="component-instance-form"] .field--name-content input',
       ),
     ).toBeVisible();
+  });
+
+  test('Shows prop descriptions, but omits link field help', async ({
+    page,
+    drupal,
+    canvasEditor,
+  }) => {
+    await drupal.createCanvasPage('Hero', '/hero');
+    await page.goto('/hero');
+    await canvasEditor.goToEditor();
+    await expect(page.locator('#block-stark-page-title h1')).toHaveCount(0);
+    await canvasEditor.openLibraryPanel();
+    await canvasEditor.addComponent({ id: 'sdc.canvas_test_sdc.my-hero' });
+
+    // Heading.
+    await expect(
+      (await canvasEditor.getActivePreviewFrame()).locator(
+        '[data-component-id="canvas_test_sdc:my-hero"] h1',
+      ),
+    ).toContainText('There goes my hero');
+    await expect(
+      await page.getByText('The main heading of the hero').count(),
+    ).toEqual(1);
+    await expect(
+      await page
+        .getByText('Start typing the title of a piece of content', {
+          exact: false,
+        })
+        .count(),
+    ).toEqual(0);
   });
 
   test('Can handle empty heading prop in hero component', async ({

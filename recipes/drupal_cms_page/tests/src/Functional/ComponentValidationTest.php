@@ -6,7 +6,6 @@ namespace Drupal\Tests\drupal_cms_page\Functional;
 
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\FunctionalTests\Core\Recipe\RecipeTestTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\drupal_cms_content_type_base\Traits\ContentModelTestTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,14 +16,13 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 class ComponentValidationTest extends BrowserTestBase {
 
   use ContentModelTestTrait;
-  use RecipeTestTrait;
 
   /**
    * {@inheritdoc}
    */
   protected $defaultTheme = 'stark';
 
-  public function test(): void {
+  public function testPageContentType(): void {
     $dir = realpath(__DIR__ . '/../../..');
     // The recipe should apply cleanly.
     $this->applyRecipe($dir);
@@ -46,6 +44,12 @@ class ComponentValidationTest extends BrowserTestBase {
       'field_content',
       'field_tags',
     ]);
+    $this->assertFieldsInOrder($form_display, [
+      'publish_on',
+      'publish_state',
+      'unpublish_on',
+      'unpublish_state',
+    ]);
 
     $default_display = $display_repository->getViewDisplay('node', 'page');
     $this->assertNull($default_display->getComponent('links'));
@@ -53,9 +57,12 @@ class ComponentValidationTest extends BrowserTestBase {
       'field_featured_image',
       'content_moderation_control',
       'field_content',
+    ]);
+    $this->assertFieldsInOrder($form_display, [
+      'field_featured_image',
+      'field_content',
       'field_tags',
     ]);
-    $this->assertSharedFieldsInSameOrder($form_display, $default_display);
 
     $card_display = $display_repository->getViewDisplay('node', 'page', 'card');
     $this->assertNull($card_display->getComponent('links'));

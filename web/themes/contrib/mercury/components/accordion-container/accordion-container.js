@@ -1,5 +1,5 @@
-import { ComponentType, ComponentInstance } from '../../lib/component.js';
-import currentlyInCanvasEditor from '../../lib/currentlyInCanvasEditor.js';
+import { ComponentType, ComponentInstance } from "../../lib/component.js";
+import currentlyInCanvasEditor from "../../lib/currentlyInCanvasEditor.js";
 
 class AccordionContainer extends ComponentInstance {
   init() {
@@ -7,24 +7,18 @@ class AccordionContainer extends ComponentInstance {
       return;
     }
 
-    // Listen for `collapsibleopen` events bubbling up from descendant
-    // collapsibles.
-    this.el.addEventListener('collapsibleopen', (e) => {
-      // Close all descendant collapsibles except the one that just opened.
-      const otherCollapsibleInstances =
-        window.mercuryComponents.collapsibleSection.instances.filter(
-          (collapsible) =>
-            this.el.contains(collapsible.el) && e.target !== collapsible.el
-        );
-      otherCollapsibleInstances.forEach((instance) => {
+    // Listen for `accordionopen` events bubbling up from descendant
+    // accordions.
+    this.el.addEventListener("accordionopen", (e) => {
+      // Close all descendant accordions except the one that just opened.
+      const otherAccordionInstances = window.mercuryComponents.accordion.instances.filter(
+        (accordion) => this.el.contains(accordion.el) && e.target !== accordion.el,
+      );
+      otherAccordionInstances.forEach((instance) => {
         instance.isOpen = false;
       });
     });
   }
 }
 
-new ComponentType(
-  AccordionContainer,
-  'accordionContainer',
-  '.accordion-container'
-);
+new ComponentType(AccordionContainer, "accordionContainer", ".accordion-container");

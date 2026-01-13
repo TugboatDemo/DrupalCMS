@@ -95,11 +95,14 @@ interface TrashManagerInterface {
    *
    * @param string $context
    *   One of 'active', 'inactive' or 'ignore'.
-   * @param callable $function
+   * @param callable(): T $function
    *   The callback to be executed.
    *
    * @return mixed
    *   The callable's return value.
+   *
+   * @template T
+   * @phpstan-return T
    */
   public function executeInTrashContext($context, callable $function): mixed;
 

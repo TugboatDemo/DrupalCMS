@@ -172,7 +172,10 @@ final class ComponentTreeItemList extends FieldItemList implements RenderableInt
     return \array_unique(\array_column($this->getValue(), 'component_id'));
   }
 
-  public function getConstraints() {
+  /**
+   * {@inheritdoc}
+   */
+  public function getConstraints(): array {
     $constraints = parent::getConstraints();
     $constraint_manger = $this->getTypedDataManager()
       ->getValidationConstraintManager();
@@ -254,6 +257,7 @@ final class ComponentTreeItemList extends FieldItemList implements RenderableInt
           // `::renderComponent()`.
           // This also associates any cache contexts and max-age; both may be
           // used for dynamic config overrides.
+          // @todo Ensure this does not appear anymore for components omitted due to field/entity access in https://www.drupal.org/i/3559820
           CacheableMetadata::createFromRenderArray($element)
             ->addCacheableDependency($component)
             ->applyTo($element);
@@ -311,6 +315,7 @@ final class ComponentTreeItemList extends FieldItemList implements RenderableInt
             $componentRenderingContext,
             $isPreview,
             $component_instance_uuid,
+            CacheableMetadata::createFromObject($component ?? NULL),
           );
         }
       }

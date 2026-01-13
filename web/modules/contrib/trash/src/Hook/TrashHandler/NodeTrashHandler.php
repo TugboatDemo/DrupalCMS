@@ -18,6 +18,10 @@ class NodeTrashHandler extends DefaultTrashHandler {
    */
   #[Hook('query_search_node_search_alter')]
   public function querySearchNodeSearchAlter(AlterableInterface $query): void {
+    if (!$this->trashManager->isEntityTypeEnabled('node')) {
+      return;
+    }
+
     // The core Search module is not using an entity query, so we need to alter
     // its query manually.
     // @see \Drupal\node\Plugin\Search\NodeSearch::findResults()

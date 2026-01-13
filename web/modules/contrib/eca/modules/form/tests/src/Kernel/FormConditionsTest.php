@@ -16,15 +16,15 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\eca\ContentTypeCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Kernel tests regarding form conditions.
- *
- * @group eca
- * @group eca_form
  */
+#[Group('eca')]
+#[Group('eca_form')]
 class FormConditionsTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;

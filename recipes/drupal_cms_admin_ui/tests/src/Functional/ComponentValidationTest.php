@@ -34,6 +34,11 @@ class ComponentValidationTest extends BrowserTestBase {
     // Apply it again to prove that it is idempotent.
     $this->applyRecipe($dir);
 
+    $this->assertContains(
+      'tbachert/spi',
+      $this->config('package_manager.settings')->get('additional_trusted_composer_plugins'),
+    );
+
     $account = $this->drupalCreateUser([
       'access navigation',
       'view welcome dashboard',

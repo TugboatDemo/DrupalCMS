@@ -2,12 +2,13 @@
 
 namespace Drupal\Tests\eca_views\Kernel;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * Kernel tests for the "eca_views" submodule.
- *
- * @group eca
- * @group eca_views
  */
+#[Group('eca')]
+#[Group('eca_views')]
 class ViewsExportTest extends ViewsQueryTest {
 
   /**

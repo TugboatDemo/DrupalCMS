@@ -2,10 +2,10 @@ name: Accessibility Tools
 type: Drupal CMS
 description: Adds automated checks to help ensure content conforms to web accessibility guidelines.
 recipes:
-  - drupal_cms_admin_ui
   - drupal_cms_page
 install:
   - editoria11y
+  - views
 config:
   strict: false
   import:
@@ -17,19 +17,3 @@ config:
         # Skipping the map pane to limit reports
         # where the fix is outwith editors control.
         ignore_elements: '.leaflet-map-pane *'
-    dashboard.dashboard.welcome:
-      addComponentToLayout:
-        section: 0
-        position: 2
-        component:
-          region:
-            layout_twocol_section: first
-          default_region: content
-          configuration:
-            id: views_block:a11y_tools_editoria11y_results-block_a11y_alerts
-            label: ''
-            label_display: visible
-            provider: views
-            context_mapping: { }
-            views_label: ''
-            items_per_page: null

@@ -8,13 +8,13 @@ use Drupal\eca_queue\Plugin\Action\EnqueueTaskDelayed;
 use Drupal\eca_queue\Task;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests for the "eca_enqueue_task_delayed" action plugin.
- *
- * @group eca
- * @group eca_queue
  */
+#[Group('eca')]
+#[Group('eca_queue')]
 class EnqueueTaskDelayedTest extends KernelTestBase {
 
   /**

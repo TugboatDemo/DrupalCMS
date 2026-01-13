@@ -18,6 +18,8 @@ use Drupal\canvas\Plugin\Field\FieldType\ComponentTreeItem;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 /**
+ * @internal
+ *
  * Defines an interface for component source plugins.
  *
  * A Component is a config entity created by a site builder that allows
@@ -58,6 +60,8 @@ interface ComponentSourceInterface extends PluginInspectionInterface, Derivative
    * @return bool
    */
   public function isBroken(): bool;
+
+  public function determineDefaultFolder(): string;
 
   /**
    * Gets referenced plugin classes for this instance.
@@ -202,7 +206,7 @@ interface ComponentSourceInterface extends PluginInspectionInterface, Derivative
    *   An associative array containing the initial structure of the plugin form.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\canvas\Entity\Component|null $component
+   * @param \Drupal\canvas\Entity\Component $component
    *   The component configuration entity.
    * @param string $component_instance_uuid
    *   The component instance UUID.
@@ -224,7 +228,7 @@ interface ComponentSourceInterface extends PluginInspectionInterface, Derivative
   public function buildComponentInstanceForm(
     array $form,
     FormStateInterface $form_state,
-    ?Component $component = NULL,
+    Component $component,
     string $component_instance_uuid = '',
     array $inputValues = [],
     ?EntityInterface $entity = NULL,
@@ -285,6 +289,8 @@ interface ComponentSourceInterface extends PluginInspectionInterface, Derivative
    *
    * @throws \Drupal\canvas\ComponentDoesNotMeetRequirementsException
    *   When the component does not meet requirements.
+   *
+   * @todo 🚨 Remove in https://www.drupal.org/project/canvas/issues/3561265.
    */
   public function checkRequirements(): void;
 
@@ -299,6 +305,8 @@ interface ComponentSourceInterface extends PluginInspectionInterface, Derivative
    *
    * @return OptimizedSingleComponentInputArray
    *   Optimized values.
+   *
+   * @throws \Drupal\canvas\InvalidComponentInputsPropSourceException
    */
   public function optimizeExplicitInput(array $values): array;
 

@@ -11,15 +11,6 @@ default:
   title:
     -
       value: 'Enhancing Security and Efficiency with User-Centric AI Tools'
-  created:
-    -
-      value: 1750997548
-  promote:
-    -
-      value: true
-  sticky:
-    -
-      value: false
   revision_translation_affected:
     -
       value: true
@@ -43,6 +34,8 @@ default:
   field_blog__byline:
     -
       value: 'Aleksander Johnson'
+  field_tags:
+    - entity: eb00eaac-ad10-4bdb-9a31-7612c47c6484
 _meta:
   version: '1.0'
   entity_type: node

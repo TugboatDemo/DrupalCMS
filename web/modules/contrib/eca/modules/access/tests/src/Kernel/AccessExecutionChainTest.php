@@ -12,13 +12,13 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Execution chain tests using plugins of eca_access.
- *
- * @group eca
- * @group eca_access
  */
+#[Group('eca')]
+#[Group('eca_access')]
 class AccessExecutionChainTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;

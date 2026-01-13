@@ -4,13 +4,13 @@ namespace Drupal\Tests\eca\Kernel\Model;
 
 use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Model test for cross references.
- *
- * @group eca
- * @group eca_model
  */
+#[Group('eca')]
+#[Group('eca_model')]
 class CrossRefTest extends Base {
 
   /**

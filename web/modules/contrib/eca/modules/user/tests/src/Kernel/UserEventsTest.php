@@ -8,13 +8,13 @@ use Drupal\eca_test_array\Plugin\Action\ArrayWrite;
 use Drupal\user\Entity\User;
 use Drupal\user\Event\UserEvents as CoreUserEvents;
 use Drupal\user\Event\UserFloodEvent;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests for events provided by "eca_user".
- *
- * @group eca
- * @group eca_user
  */
+#[Group('eca')]
+#[Group('eca_user')]
 class UserEventsTest extends KernelTestBase {
 
   /**

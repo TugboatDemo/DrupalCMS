@@ -2,8 +2,10 @@
 
 namespace Drupal\linkit\Entity;
 
+use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\linkit\MatcherCollection;
 use Drupal\linkit\MatcherInterface;
 use Drupal\linkit\Plugin\Linkit\Matcher\EntityMatcher;
@@ -136,6 +138,7 @@ class Profile extends ConfigEntityBase implements ProfileInterface, EntityWithPl
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Add matcher to profile'))]
   public function addMatcher(array $configuration) {
     $configuration['uuid'] = $this->uuidGenerator()->generate();
     $this->getMatchers()->addInstanceId($configuration['uuid'], $configuration);
@@ -154,6 +157,7 @@ class Profile extends ConfigEntityBase implements ProfileInterface, EntityWithPl
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Set matcher configuration'))]
   public function setMatcherConfig($instance_id, array $configuration) {
     $this->matchers[$instance_id] = $configuration;
     $this->getMatchers()->setInstanceConfiguration($instance_id, $configuration);

@@ -10,7 +10,6 @@ install:
   - redirect
   - redirect_404
   - token
-  - user
   - views
 config:
   strict:

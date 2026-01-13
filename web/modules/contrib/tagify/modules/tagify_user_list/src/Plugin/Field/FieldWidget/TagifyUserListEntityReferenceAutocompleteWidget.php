@@ -202,6 +202,8 @@ class TagifyUserListEntityReferenceAutocompleteWidget extends TagifyEntityRefere
       '#placeholder' => $this->getSetting('placeholder'),
       '#suggestions_dropdown' => $this->getSetting('suggestions_dropdown'),
       '#image' => $this->getSetting('image'),
+      // Pass the identifier including any field parent position suffix.
+      '#identifier' => $tags_identifier,
       '#image_style' => $this->getSetting('image_style'),
       '#attributes' => [
         'class' => [$limited, $autocreate, $tags_identifier],

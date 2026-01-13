@@ -7,13 +7,13 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\eca\Entity\Eca;
 use Drupal\user\Entity\Role;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests for pre-configured actions.
- *
- * @group eca
- * @group eca_core
  */
+#[Group('eca')]
+#[Group('eca_core')]
 class PreconfiguredActionTest extends KernelTestBase {
 
   /**

@@ -2,6 +2,7 @@
 
 namespace Drupal\tagify\Element;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\Select;
 
@@ -97,6 +98,8 @@ class SelectTagify extends Select {
     $info['#match_limit'] = 20;
     $info['#match_operator'] = 'CONTAINS';
     $info['#placeholder'] = '';
+    $info['#show_entity_id'] = 0;
+    $info['#parent_selection'] = 1;
     return $info;
   }
 
@@ -119,13 +122,11 @@ class SelectTagify extends Select {
    *   The form element.
    */
   public static function processSelectTagify(&$element, FormStateInterface $form_state, &$complete_form) {
-    $element['#attached'] = [
+    $element['#attached'] = NestedArray::mergeDeep($element['#attached'] ?? [], [
       'library' => [
-        'tagify/tagify',
         'tagify/default',
-        'tagify/tagify_polyfils',
       ],
-    ];
+    ]);
 
     if (_tagify_is_gin_theme_active()) {
       $element['#attached']['library'][] = 'tagify/gin';
@@ -142,6 +143,8 @@ class SelectTagify extends Select {
     $element['#attributes']['data-match-operator'] = ($element['#match_operator'] === 'CONTAINS') ? 1 : 0;
     $element['#attributes']['data-match-limit'] = $element['#match_limit'];
     $element['#attributes']['data-placeholder'] = $element['#placeholder'];
+    $element['#attributes']['data-show-entity-id'] = $element['#show_entity_id'] ?? '';
+    $element['#attributes']['data-parent-selection'] = $element['#parent_selection'] ?? '';
 
     // Information text.
     $element['#attached']['drupalSettings']['tagify_select']['information_message'] = [

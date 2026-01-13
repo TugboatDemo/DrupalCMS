@@ -34,19 +34,15 @@ class TrashHandlerPass implements CompilerPassInterface {
     foreach ($trash_handlers as $id => $attributes) {
       $entity_type_id = $attributes[0]['entity_type_id'];
 
-      // Remove trash handlers for entity types that aren't enabled.
-      if (!isset($enabled_entity_types[$entity_type_id])) {
-        $container->removeDefinition($id);
-      }
-      else {
+      if (isset($enabled_entity_types[$entity_type_id])) {
         // Keep track of entity types without a dedicated trash handler so we
         // can create one for them automatically.
         unset($enabled_entity_types[$entity_type_id]);
-
-        $container->getDefinition($id)
-          ->addMethodCall('setEntityTypeId', [$entity_type_id])
-          ->setConfigurator(new Reference('trash.handler_configurator'));
       }
+
+      $container->getDefinition($id)
+        ->addMethodCall('setEntityTypeId', [$entity_type_id])
+        ->setConfigurator(new Reference('trash.handler_configurator'));
     }
 
     // Register a trash handler for entity types without a dedicated one.

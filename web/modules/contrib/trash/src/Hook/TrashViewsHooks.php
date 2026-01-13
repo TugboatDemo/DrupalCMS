@@ -115,10 +115,15 @@ class TrashViewsHooks {
       $query->addTag('trash_altered');
     }
     // Otherwise ignore trash for the duration of this view, so it can load and
-    // display deleted entities.
+    // display deleted entities. It will restore the context after the view has
+    // finished execution.
     else {
-      $this->trashManager->setTrashContext('ignore');
-      $query->addTag('ignore_trash');
+      if (!in_array('ignore_trash', $query->tags, TRUE)) {
+        $original_context = $this->trashManager->getTrashContext();
+        $this->trashManager->setTrashContext('ignore');
+        $query->addTag('ignore_trash');
+        $query->addTag("original_trash_context:$original_context");
+      }
     }
   }
 
@@ -154,14 +159,61 @@ class TrashViewsHooks {
   }
 
   /**
+   * Implements hook_views_post_build().
+   */
+  #[Hook('views_post_build')]
+  public function viewsPostBuild(ViewExecutable $view): void {
+    if ($view->executed) {
+      // The view was flagged as executed during the build phase.
+      $this->restoreTrashContext($view);
+    }
+  }
+
+  /**
+   * Implements hook_views_post_execute().
+   */
+  #[Hook('views_post_execute')]
+  public function viewsPostExecute(ViewExecutable $view): void {
+    $this->restoreTrashContext($view);
+  }
+
+  /**
+   * Implements hook_views_pre_render().
+   */
+  #[Hook('views_pre_render')]
+  public function viewsPreRender(ViewExecutable $view): void {
+    // If the view is also being rendered, then attempt to reignore the trash
+    // context, it'll be restored in the post_render hook.
+    $query = $view->getQuery();
+    if ($query instanceof Sql && in_array('ignore_trash', $query->tags, TRUE)) {
+      $this->trashManager->setTrashContext('ignore');
+    }
+  }
+
+  /**
    * Implements hook_views_post_render().
    */
   #[Hook('views_post_render')]
   public function viewsPostRender(ViewExecutable $view): void {
+    // Restore the trash context after the view has been built.
+    $this->restoreTrashContext($view);
+  }
+
+  /**
+   * Restore the trash context after a view is finished executing.
+   */
+  protected function restoreTrashContext(ViewExecutable $view): void {
     $query = $view->getQuery();
     if ($query instanceof Sql && in_array('ignore_trash', $query->tags, TRUE)) {
-      // Enable trash again after the view has been built.
-      $this->trashManager->setTrashContext('active');
+      foreach ($query->tags as $tag) {
+        assert(is_string($tag));
+        if (str_starts_with($tag, 'original_trash_context:')) {
+          [, $previous_trash_context] = explode(':', $tag, 2);
+          // Restore the trash context to what it originally was.
+          $this->trashManager->setTrashContext($previous_trash_context);
+          break;
+        }
+      }
     }
   }
 

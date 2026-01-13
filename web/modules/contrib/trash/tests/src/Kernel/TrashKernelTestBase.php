@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\trash\Kernel;
 
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
@@ -40,6 +44,11 @@ abstract class TrashKernelTestBase extends KernelTestBase {
   protected bool $usesSuperUserAccessPolicy = FALSE;
 
   /**
+   * The entity type manager.
+   */
+  protected EntityTypeManagerInterface $entityTypeManager;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -67,7 +76,21 @@ abstract class TrashKernelTestBase extends KernelTestBase {
    * Gets the trash manager.
    */
   protected function getTrashManager(): TrashManagerInterface {
-    return \Drupal::service('trash.manager');
+    return $this->container->get('trash.manager');
+  }
+
+  /**
+   * Gets the entity type manager.
+   */
+  protected function getEntityTypeManager(): EntityTypeManagerInterface {
+    return $this->container->get('entity_type.manager');
+  }
+
+  /**
+   * Gets the entity repository.
+   */
+  protected function getEntityRepository(): EntityRepositoryInterface {
+    return $this->container->get('entity.repository');
   }
 
   /**
@@ -98,6 +121,7 @@ abstract class TrashKernelTestBase extends KernelTestBase {
 
     // Rebuild the container so trash handlers are available.
     $this->container->get('kernel')->rebuildContainer();
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
   }
 
   /**
@@ -117,6 +141,7 @@ abstract class TrashKernelTestBase extends KernelTestBase {
 
     // Rebuild the container.
     $this->container->get('kernel')->rebuildContainer();
+    $this->entityTypeManager = $this->container->get('entity_type.manager');
   }
 
 }

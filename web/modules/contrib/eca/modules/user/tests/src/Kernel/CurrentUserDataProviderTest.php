@@ -5,13 +5,13 @@ namespace Drupal\Tests\eca\Kernel;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests for the "eca.token_data.current_user" service.
- *
- * @group eca
- * @group eca_user
  */
+#[Group('eca')]
+#[Group('eca_user')]
 class CurrentUserDataProviderTest extends KernelTestBase {
 
   /**

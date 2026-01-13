@@ -253,6 +253,7 @@
          </footer>`
             : '';
         }
+
         // Tagify initialization.
         // eslint-disable-next-line no-undef
         const tagify = new Tagify(input, {
@@ -319,6 +320,115 @@
           },
         });
 
+        // The below code is printed as escaped, so please copy this function from:
+        // https://github.com/yairEO/tagify/blob/master/src/parts/helpers.js#L89-L97
+        function escapeHTML(s) {
+          return typeof s === 'string'
+            ? s.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>')
+            : s;
+        }
+
+        // Split the taxonomy terms into groups, when rendering the suggestions list dropdown:
+        // (since each term also has a 'parent' property)
+        tagify.dropdown.createListHTML = (suggestionsList) => {
+          if (isTagLimitReached()) {
+            return '';
+          }
+          const parentsOfTerms = suggestionsList.reduce((acc, suggestion) => {
+            const parent = suggestion.parent_name || '';
+
+            if (!acc[parent]) acc[parent] = [suggestion];
+            else acc[parent].push(suggestion);
+
+            return acc;
+          }, {});
+
+          // Build a set of parent names that have children
+          const parentNamesWithChildren = new Set();
+          Object.keys(parentsOfTerms).forEach((key) => {
+            if (key) {
+              parentNamesWithChildren.add(key);
+            }
+          });
+
+          const getTermsSuggestionsHTML = (parentTerms) =>
+            parentTerms
+              .map((suggestion) => {
+                if (
+                  typeof suggestion === 'string' ||
+                  typeof suggestion === 'number'
+                )
+                  suggestion = { value: suggestion };
+
+                const value = tagify.dropdown.getMappedValue.call(
+                  tagify,
+                  suggestion,
+                );
+
+                suggestion.label =
+                  value && typeof value === 'string'
+                    ? escapeHTML(value)
+                    : value;
+
+                return tagify.settings.templates.dropdownItem.apply(tagify, [
+                  suggestion,
+                ]);
+              })
+              .join('');
+
+          // Assign the item to a group.
+          return Object.entries(parentsOfTerms)
+            .map(([parentName, childName]) => {
+              if (parentName) {
+                // Find the parent suggestion to get its attributes
+                const parentSuggestion = suggestionsList.find(
+                  (s) => s.label === parentName && !s.parent_name,
+                );
+
+                // Create parent header (clickable only if parentSelection is enabled)
+                let parentHeaderHTML = '';
+                const isParentSelectionEnabled = parseInt(
+                  input.dataset.parentSelection,
+                  10,
+                );
+
+                if (parentSuggestion && isParentSelectionEnabled) {
+                  const value = tagify.dropdown.getMappedValue.call(
+                    tagify,
+                    parentSuggestion,
+                  );
+                  parentSuggestion.label =
+                    value && typeof value === 'string'
+                      ? escapeHTML(value)
+                      : value;
+
+                  parentHeaderHTML = `<div class="tagify__dropdown__item tagify__dropdown__item--parent" ${
+                    tagify.getAttributes
+                      ? tagify.getAttributes(parentSuggestion)
+                      : ''
+                  } tabindex="0" role="option">
+                    <div class="tagify__dropdown__item-highlighted dropdown_group">${parentName}</div>
+                  </div>`;
+                } else {
+                  parentHeaderHTML = `<span class="dropdown_group">${parentName}</span>`;
+                }
+
+                return `<div class="tagify__dropdown__itemsGroup" data-title="${parentName}">
+                ${parentHeaderHTML}
+                ${getTermsSuggestionsHTML(childName)}
+              </div>`;
+              }
+              // Filter out items that are parents with children
+              const filteredChildName = childName.filter(
+                (item) => !parentNamesWithChildren.has(item.label),
+              );
+              return parseInt(input.dataset.parentSelection, 10)
+                ? getTermsSuggestionsHTML(filteredChildName)
+                : '';
+            })
+            .join('');
+        };
+
         /**
          * Handles autocomplete functionality for the input field using Tagify.
          * @param {string} value - The current value of the input field.
@@ -356,6 +466,7 @@
               const newWhitelistData = newWhitelist.map((current) => ({
                 value: current.entity_id,
                 entity_id: current.entity_id,
+                parent_name: current.parent_name,
                 info_label: current.info_label,
                 label: current.label,
                 editable: current.editable,
@@ -495,12 +606,41 @@
         }
 
         /**
+         * Generates HTML markup for an entity id.
+         * @param {string} entityId - The entity id.
+         * @return {string} The entity id markup HTML.
+         */
+        function entityIdMarkup(entityId) {
+          return parseInt(select.dataset.showEntityId, 10) && entityId
+            ? `<div id="tagify__tag-items" class="tagify__tag_with-entity-id"><div class='tagify__tag__entity-id-wrap'><span class='tagify__tag-entity-id'>${entityId}</span></div></div>`
+            : '';
+        }
+
+        /**
+         * Generates HTML markup for a tag.
+         * @param {string} tagLabel - The label.
+         * @param {string} tagEntityId - The entity id.
+         * @return {string} The tag markup HTML.
+         */
+        function tagMarkup(tagLabel, tagEntityId) {
+          return `<div id="tagify__tag-items">${tagEntityId}
+            <span class="${
+              tagEntityId
+                ? 'tagify__tag-text-with-entity-id'
+                : 'tagify__tag-text'
+            }">${tagLabel}</span>
+            </div>`;
+        }
+
+        /**
          * Generates HTML markup for a tag based on the provided tagData.
-         *
-         * @param {Object} tagData - Data for the tag, including value, text, class, etc.
-         * @return {string} - HTML markup for the generated tag.
+         * @param {Object} tagData - Data for the tag, including value, entity_id, class, etc.
+         * @return {string} - The HTML markup for the generated tag.
          */
         function tagTemplate(tagData) {
+          // Avoid 'undefined' values on paste event.
+          const label = tagData.text ?? tagData.label;
+
           return `<tag title="${tagData.text}"
             contenteditable='false'
             spellcheck='false'
@@ -514,9 +654,7 @@
             aria-label='remove tag'
             tabIndex="0">
             </x>
-            <div id="tagify__tag-items">
-            <span class='tagify__tag-text'>${tagData.text}</span>
-            </div>
+              ${tagMarkup(label, entityIdMarkup(tagData.value))}
           </tag>`;
         }
 
@@ -536,12 +674,25 @@
               this.state.inputText,
             );
 
-            return `<div class='${dropdownItemClass}'
-              value="${tagData.value}"
-              tabindex="0"
-              role="option">
-              <div class="tagify__dropdown__item-highlighted">${highlightedText}</div>
-            </div>`;
+            const event = new CustomEvent('tagifyDropDownItemTemplate', {
+              bubbles: true,
+              detail: {
+                template: `
+                  <div class='${dropdownItemClass}'
+                    value="${tagData.value}"
+                    tabindex="0"
+                    role="option">
+                    <div class="tagify__dropdown__item-highlighted">${highlightedText}</div>
+                  </div>`,
+                classNames,
+                tagData,
+                highlightedText,
+                select,
+              },
+            });
+
+            select.dispatchEvent(event);
+            return event.detail.template;
           }
 
           return '';
@@ -549,15 +700,56 @@
 
         const options = [];
         const selected = [];
-        // eslint-disable-next-line func-names
-        [...this.options].forEach(function (option) {
+        const parentStack = [];
+        let hasHierarchy = false;
+
+        [...this.options].forEach((option) => {
           if (!option.value || !option.text) {
             return;
           }
-          options.push({ value: option.value, text: option.text });
-          if (option.selected) {
-            selected.push({ value: option.value, text: option.text });
+
+          // Extract hierarchy level based on leading dashes
+          const match = option.text.match(/^(-+)\s*/); // Matches leading dashes
+          const level = match ? match[1].length : 0; // Number of dashes determines depth
+          const text = option.text.replace(/^(-+\s*)/, ''); // Remove leading dashes
+
+          if (level > 0) {
+            hasHierarchy = true;
           }
+
+          // Adjust parent stack based on depth
+          while (
+            parentStack.length > 0 &&
+            parentStack[parentStack.length - 1].level >= level
+          ) {
+            parentStack.pop();
+          }
+
+          // Determine parent
+          const parent =
+            parentStack.length > 0
+              ? parentStack[parentStack.length - 1].text
+              : null;
+
+          // Store the current option
+          const optionData = { value: option.value, text, label: text, parent };
+          options.push(optionData);
+
+          // Add to selected if applicable
+          if (option.selected) {
+            selected.push(optionData);
+          }
+
+          // Push current item as a potential parent
+          parentStack.push({ text, level });
+        });
+
+        // Sorting: Ensure parents appear before children
+        options.sort((a, b) => {
+          if (!a.parent && b.parent) return -1;
+          if (a.parent && !b.parent) return 1;
+          if (a.parent === b.parent) return a.level - b.level;
+          return 0;
         });
 
         /**
@@ -621,6 +813,73 @@
           placeholder,
         });
 
+        // Function to escape HTML special characters
+        function escapeHTML(s) {
+          return typeof s === 'string'
+            ? s
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+            : s;
+        }
+
+        // Custom function to group taxonomy terms in the dropdown
+        tagify.dropdown.createListHTML = (suggestionsList) => {
+          if (isTagLimitReached() && !mode) {
+            return '';
+          }
+
+          // Grouping suggestions by their parent category
+          const parentsOfTerms = suggestionsList.reduce((acc, suggestion) => {
+            const parent = suggestion.parent || ''; // Default to empty if no parent
+
+            if (!acc[parent]) acc[parent] = [suggestion];
+            else acc[parent].push(suggestion);
+
+            return acc;
+          }, {});
+
+          // Function to generate HTML for terms within a parent group
+          const getTermsSuggestionsHTML = (parentTerms) =>
+            parentTerms
+              .map((suggestion) => {
+                if (
+                  typeof suggestion === 'string' ||
+                  typeof suggestion === 'number'
+                ) {
+                  suggestion = { value: suggestion };
+                }
+
+                // Map the value properly and escape HTML
+                const value = tagify.dropdown.getMappedValue.call(
+                  tagify,
+                  suggestion,
+                );
+                suggestion.label =
+                  value && typeof value === 'string'
+                    ? escapeHTML(value)
+                    : value;
+
+                return tagify.settings.templates.dropdownItem.apply(tagify, [
+                  suggestion,
+                ]);
+              })
+              .join('');
+
+          // Generate final grouped dropdown list
+          return Object.entries(parentsOfTerms)
+            .map(([parentName, childName]) => {
+              if (parentName) {
+                return `<div class="tagify__dropdown__itemsGroup" data-title="${parentName}">
+          <span class="dropdown_group">${parentName}</span>
+          ${getTermsSuggestionsHTML(childName)}
+        </div>`;
+              }
+              return !hasHierarchy ? getTermsSuggestionsHTML(childName) : '';
+            })
+            .join('');
+        };
+
         // Remove tagify--select class to keep Tagify styles.
         if (select.dataset.mode) {
           const tagsElement = document.querySelector(`.${identifier}`);
@@ -665,6 +924,22 @@
           }
           // Trigger a native change event so Drupal's AJAX system responds.
           select.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        /**
+         * Listens to change tag event and updates select values accordingly.
+         */
+        // eslint-disable-next-line func-names
+        tagify.on('change', function (e) {
+          // Trigger a native change event so Drupal's AJAX system responds.
+          JSON.parse(e.detail.value).forEach((item) => {
+            const { value } = item;
+            const option = select.querySelector(`option[value="${value}"]`);
+            if (option) {
+              option.selected = true;
+              select.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          });
         });
 
         /**

@@ -35,14 +35,6 @@ class ComponentValidationTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $configSchemaCheckerExclusions = [
-    // This ECA model uses actions which don't have config schema in ECA yet.
-    'eca.eca.setup_seo_fields',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
   protected function setUp(): void {
     parent::setUp();
     // Create a content type so we can test the changes made by the recipe.

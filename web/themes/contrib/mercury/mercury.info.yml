@@ -1,23 +1,20 @@
 name: Mercury
 type: theme
-'base theme': false
+"base theme": false
 libraries:
   - mercury/global
-  - mercury/phosphor-icons
-  - mercury/messages
-libraries-extend:
-  core/drupal.dialog:
-    - mercury/dialog
 logo: logo-dark.svg
-description: 'A scalable, modern Drupal CMS prototype theme, integrating cutting-edge front-end tools and a flexible, component-based design system.'
-core_version_requirement: ^11
-generator: 'starterkit_theme:11.1.1'
-components:
-  namespaces:
-    mercury_theme: components
-    drupalRoot: components
+description: "A scalable, modern Drupal CMS prototype theme, integrating cutting-edge front-end tools and a flexible, component-based design system."
+core_version_requirement: ^11.3
+generator: "starterkit_theme:11.1.1"
+regions:
+  content: Content
+  header: Header
+  footer: Footer
+dependencies:
+  - cva:cva
 
-# Information added by Drupal.org packaging script on 2025-10-17
-version: '1.0.0-alpha1'
+# Information added by Drupal.org packaging script on 2026-01-06
+version: '1.0.0-beta3'
 project: 'mercury'
-datestamp: 1760700300
+datestamp: 1767732539

@@ -445,7 +445,7 @@ final class ApiLayoutControllerPostTest extends ApiLayoutControllerTestBase {
   /**
    * @dataProvider providerEntityTypes
    */
-  public function testWithDraftCodeComponent(string $entity_type): void {
+  public function testWithCodeComponent(string $entity_type): void {
     $entity = $this->getTestEntity($entity_type);
     $this->setUpCurrentUser([], [self::getAdminPermission($entity)]);
 
@@ -487,10 +487,7 @@ final class ApiLayoutControllerPostTest extends ApiLayoutControllerTestBase {
     ];
     $code_component->set('props', $props);
     $code_component->set('name', 'Here comes the');
-    // But store an overridden version in auto-save (draft).
-    /** @var \Drupal\canvas\AutoSave\AutoSaveManager $autoSave */
-    $autoSave = $this->container->get(AutoSaveManager::class);
-    $autoSave->saveEntity($code_component);
+    $code_component->save();
 
     // Load the test data from the layout controller.
     $url = $this->getLayoutUrl($entity)->toString();
@@ -684,7 +681,7 @@ final class ApiLayoutControllerPostTest extends ApiLayoutControllerTestBase {
     $expected_preview_html = str_replace('Canvas/MODULE/PATH', $module_path, $expected_preview_html);
     \assert($reference_media->field_media_image->entity instanceof FileInterface);
     // @phpstan-ignore-next-line
-    $expected_preview_html = str_replace('!!REFERENCED_MEDIA!!', $reference_media->field_media_image->src_with_alternate_widths, $expected_preview_html);
+    $expected_preview_html = str_replace('!!REFERENCED_MEDIA!!', $reference_media->field_media_image->src_with_alternate_widths->getGeneratedUrl(), $expected_preview_html);
 
     unset($json['html'], $json['isPublished'], $json['isNew']);
     $this->request(Request::create('/canvas/api/v0/layout/node/1', method: 'POST', content: json_encode($json, JSON_THROW_ON_ERROR)));

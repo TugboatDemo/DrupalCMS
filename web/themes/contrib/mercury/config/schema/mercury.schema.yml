@@ -1,6 +1,6 @@
 mercury.settings:
   type: theme_settings
-  label: 'Mercury settings'
+  label: "Mercury settings"
   mapping:
     scheme:
       type: string

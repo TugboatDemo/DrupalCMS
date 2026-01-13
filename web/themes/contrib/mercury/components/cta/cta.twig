@@ -1,44 +1,110 @@
-{% set classes = [
-    'cta',
-    'hg:relative',
-    'hg:z-1',
-  ]
+{% set cta_text_align = text_align|default('center') %}
+{% set background_color = background_color|default('noColor') %}
+
+{% set cta_variants =
+  html_cva(
+    base: ['relative z-1'],
+    variants: {
+      backgroundColor: {
+        primary: 'bg-primary text-primary-foreground',
+        secondary: 'bg-secondary text-secondary-foreground',
+        accent: 'bg-accent text-accent-foreground',
+        muted: 'bg-muted text-muted-foreground',
+        inverted: 'bg-foreground text-background',
+        noColor: 'bg-none text-foreground'
+      }
+    }
+  )
 %}
 
-{% if text_align == 'left' %}
-  {% set alignment = 'hg:text-left' %}
-  {% set list_extras = 'hg:md:justify-start' %}
-{% elseif text_align == 'right' %}
-  {% set alignment = 'hg:text-right' %}
-  {% set list_extras = 'hg:md:justify-end' %}
-{% else %}
-  {% set alignment = 'hg:text-center hg:lg:max-w-3/4 hg:mx-auto' %}
-  {% set list_extras = 'hg:justify-center hg:items-center' %}
-{% endif %}
+{% set cta_content_variants =
+  html_cva(
+    base: ['relative', 'flex flex-col justify-center', 'min-h-80', 'gap-6 lg:gap-8', 'py-[90px] lg:py-[115px] xl:py-[140px]'],
+    variants: {
+      textAlign: {
+        left: ['text-left'],
+        right: ['text-right'],
+        center: ['text-center', 'lg:max-w-3/4', 'mx-auto', 'items-center']
+      },
+      hasBackground: {
+        yes: 'text-white!',
+        no: ''
+      }
+    }
+  )
+%}
 
-{% if has_background_image == true %}
-  {% set text_color = 'hg:text-white!' %}
-{% endif %}
+{% set cta_links_variants =
+  html_cva(
+    base: ['flex', 'w-full', 'flex-col', 'gap-6', 'sm:flex-row'],
+    variants: {
+      textAlign: {
+        left: 'md:justify-start',
+        right: 'md:justify-end',
+        center: ['justify-center', 'items-center']
+      }
+    }
+  )
+%}
 
-<section class="{{ classes|join(' ') }}">
+<section
+  class="{{
+  cta_variants.apply({
+    backgroundColor: background_color
+  })
+  }}"
+>
   {% block media %}
-    {% if media.src is not empty and has_background_image %}
-      <div class="cta--media hg:absolute hg:w-screen hg:h-full hg:z-[-1] hg:ms-[-50vw] hg:left-[50%]">
-        <div class="hg:absolute hg:inset-0 hg:bg-black/30"></div>
-        <img src="{{ media.src }}" alt="{{ media.alt }}" class="hg:w-full hg:h-full hg:object-cover"/>
+    {% if media.src is not empty %}
+      <div class="absolute z-[-1] h-full w-full">
+        <div class="absolute inset-0 bg-black/30"></div>
+        {% include 'canvas:image' ignore missing with {
+          src: media.src,
+          alt: media.alt,
+          class: 'object-cover w-full h-full',
+          width: media.width,
+          height: media.height
+        } only %}
       </div>
     {% endif %}
   {% endblock %}
-  <div class="cta--content hg:relative hg:min-h-80 hg:flex hg:flex-col hg:justify-center hg:gap-6 hg:lg:gap-8 hg:py-[90px] hg:lg:py-[115px] hg:xl:py-[140px] {{ text_align == 'center' ? 'hg:items-center' }} {{ alignment }} {{ text_color }}">
-    {{ include('mercury:heading', {
-        heading_classes: ['hg:font-extrabold']
-    }) }}
-    <p class="hg:font-normal hg:text-md">{{ text }}</p>
+  <div
+    class="{{
+    cta_content_variants.apply({
+      textAlign: cta_text_align
+    })
+    }} px-4"
+  >
+    {{
+      include(
+        'mercury:heading',
+        {
+          heading_text: heading_text|default(''),
+          level: level|default(2),
+          align: cta_text_align,
+          text_color: 'default',
+          url: '',
+          heading_classes: 'max-w-3xl',
+          text_size: 'heading-responsive-7xl'
+        },
+        with_context: false
+      )
+    }}
+    <p class="max-w-2xl text-xl font-normal">
+      {{ text }}
+    </p>
     {% if block('actions') is defined %}
-    <div class="cta--links hg:w-full hg:flex hg:flex-col hg:sm:flex-row hg:gap-6 {{ list_extras }}">
-      {% block actions %}
-      {% endblock %}
-    </div>
+      <div
+        class="{{
+        cta_links_variants.apply({
+          textAlign: cta_text_align
+        })
+        }}"
+      >
+        {% block actions %}
+
+        {% endblock %}
+      </div>
     {% endif %}
   </div>
 </section>

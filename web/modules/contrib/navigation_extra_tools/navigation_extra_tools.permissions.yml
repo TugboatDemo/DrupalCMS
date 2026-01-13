@@ -1,0 +1,8 @@
+access navigation extra tools cache flushing:
+  title: 'Access navigation extra tools: cache flushing'
+  description: 'Allows access to the cache flushing extra tools in the navigation bar'
+  restrict access: true
+access navigation extra tools cron:
+  title: 'Access navigation extra tools: cron'
+  description: 'Allows access to the cron extra tools in the navigation bar'
+  restrict access: true

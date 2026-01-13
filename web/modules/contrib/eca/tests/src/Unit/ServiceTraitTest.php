@@ -6,13 +6,13 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Tests\UnitTestCase;
 use Drupal\eca\Service\ServiceTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests the service trait.
- *
- * @group eca
  */
+#[Group('eca')]
 class ServiceTraitTest extends UnitTestCase {
 
   use ServiceTrait;

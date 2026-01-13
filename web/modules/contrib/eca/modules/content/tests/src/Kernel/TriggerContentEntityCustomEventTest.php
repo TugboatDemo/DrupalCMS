@@ -10,13 +10,13 @@ use Drupal\node\Entity\Node;
 use Drupal\node\NodeInterface;
 use Drupal\Tests\eca\ContentTypeCreationTrait;
 use Drupal\user\Entity\User;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Kernel tests for the "eca_trigger_content_entity_custom_event" action plugin.
- *
- * @group eca
- * @group eca_content
  */
+#[Group('eca')]
+#[Group('eca_content')]
 class TriggerContentEntityCustomEventTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;

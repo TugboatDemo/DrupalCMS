@@ -53,8 +53,9 @@ input:
           'input[name*="drupal_cms_ai"][name$="[provider]"]':
             value: openai
     default:
-      source: value
-      value: ''
+      source: env
+      env: openai_api_key
+      fallback: ''
   anthropic_api_key:
     data_type: string
     description: The Anthropic API key, if you want to use Anthropic.
@@ -76,8 +77,9 @@ input:
           'input[name*="drupal_cms_ai"][name$="[provider]"]':
             value: anthropic
     default:
-      source: value
-      value: ''
+      source: env
+      env: anthropic_api_key
+      fallback: ''
 config:
   strict: false
   import:
@@ -106,7 +108,6 @@ config:
         key_value: ${openai_api_key}
         key_name: openai_api_key
         key_label: 'OpenAI API Key'
-        env_var: openai_api_key
         provider: openai
       simpleConfigUpdate:
         moderation: true
@@ -115,7 +116,6 @@ config:
         key_value: ${anthropic_api_key}
         key_name: anthropic_api_key
         key_label: 'Anthropic API Key'
-        env_var: anthropic_api_key
         provider: anthropic
       simpleConfigUpdate:
         openai_moderation: false

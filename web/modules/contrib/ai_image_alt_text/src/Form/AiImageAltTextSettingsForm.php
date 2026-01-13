@@ -81,6 +81,7 @@ class AiImageAltTextSettingsForm extends ConfigFormBase {
       '#items' => [
         $this->t('Prompt is rendered using Twig rendering engine and supports the following tokens:'),
         '{{ entity_lang_name }} - ' . $this->t('Human readable name of the entity language'),
+        '{{ filename }} - ' . $this->t('The original filename of the uploaded image'),
       ],
     ];
 

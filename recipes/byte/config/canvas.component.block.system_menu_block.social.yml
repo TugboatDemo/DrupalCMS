@@ -5,7 +5,7 @@ dependencies:
     - system.menu.social
   module:
     - system
-active_version: 2b669e6cee911c12
+active_version: 61f1f0168c94b6b6
 versioned_properties:
   active:
     settings:

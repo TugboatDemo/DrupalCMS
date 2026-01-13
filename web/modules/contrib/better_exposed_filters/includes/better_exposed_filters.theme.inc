@@ -215,13 +215,17 @@ function template_preprocess_bef_links(array &$variables): void {
   $name = $element['#name'];
   $multiple = $element['#multiple'] ?? FALSE;
 
-  // Set multiple attribute.
-  if ($multiple) {
-    $variables['attributes']['multiple'] = 'multiple';
-  }
+  // We remove these keys because bef-links renders as a div making these
+  // not needed.
+  $keys_to_remove = ['size', 'name', 'multiple'];
 
-  // Set element name.
-  $variables['attributes']['name'] = $name;
+  foreach ($keys_to_remove as $key) {
+    if (isset($variables['attributes'][$key])) {
+      // Add the attribute as a data-* attribute for easier JS access.
+      $variables['attributes']["data-$key"] = $variables['attributes'][$key];
+    }
+  }
+  $variables['attributes'] = array_diff_key($variables['attributes'], array_flip($keys_to_remove));
 
   // Get the query string arguments from the current request.
   $existing_query = \Drupal::service('request_stack')->getCurrentRequest()->query->all();
@@ -262,6 +266,10 @@ function template_preprocess_bef_links(array &$variables): void {
 
     if ($multiple) {
       $newQuery = $existing_query;
+      // Unset any empty parameters first.
+      if (empty($newQuery[$name])) {
+        unset($newQuery[$name]);
+      }
       if (!isset($newQuery[$name])) {
         $newQuery[$name] = [];
       }
@@ -272,10 +280,7 @@ function template_preprocess_bef_links(array &$variables): void {
         });
       }
       else {
-        $newQuery[$name][] = $optionValue;
-      }
-      if (empty($newQuery[$name])) {
-        unset($newQuery[$name]);
+        $newQuery[$name][$optionValue] = $optionValue;
       }
 
       $urlOptions['query'] = $newQuery;
@@ -310,6 +315,7 @@ function template_preprocess_bef_links(array &$variables): void {
         'name' => $name . '[' . $optionValue . ']',
         'class' => [
           'bef-link',
+          Html::getUniqueId('edit-' . $name),
         ],
       ],
       '#type' => 'link',

@@ -42,17 +42,29 @@
    */
   Drupal.behaviors.betterExposedFiltersAutoSubmit = {
     attach: function (context, settings) {
-      // When exposed as a block, the form #attributes are moved from the form
-      // to the block element, thus the second selector.
-      // @see \Drupal\block\BlockViewBuilder::preRender
-      const selectors = 'form[data-bef-auto-submit-full-form], [data-bef-auto-submit-full-form] form, [data-bef-auto-submit]';
 
-      $(selectors, context).addBack(selectors).find('input:text:not(.hasDatepicker), textarea').each(function () {
+      let selectors = '';
+      if (drupalSettings.better_exposed_filters.auto_submit_sort_only) {
+        selectors = 'form[data-bef-auto-submit-sort-only] .form-item-sort-order';
+      }
+      else {
+        // When exposed as a block, the form #attributes are moved from the form
+        // to the block element, thus the second selector.
+        // @see \Drupal\block\BlockViewBuilder::preRender
+        selectors = 'form[data-bef-auto-submit-full-form], [data-bef-auto-submit-full-form] form, [data-bef-auto-submit]';
+      }
+
+      $(selectors, context).addBack(selectors).find('input:text:not(.hasDatepicker), textarea, select').each(function () {
         const $el = $(this);
         const $valueLength = $el.val().length * 2;
-
-        $el[0].setSelectionRange($valueLength, $valueLength);
-        setFocus($el, $valueLength);
+        const $tagName = $el[0].tagName;
+        if ($tagName === 'SELECT') {
+          setFocus($el);
+        }
+        else {
+          $el[0].setSelectionRange($valueLength, $valueLength);
+          setFocus($el, $valueLength);
+        }
       });
 
       function setFocus($el) {
@@ -141,11 +153,19 @@
           9, // Tab.
           13, // Enter.
           27,  // Esc.
+          32, // Space.
         ];
 
         // Triggering element.
         const $target = $(e.target);
-        const $submit = $target.closest('form').find('[data-bef-auto-submit-click]');
+        const $form = e.target.form ? $(e.target.form) : $target.closest('form');
+        const $submit = $form.find('[data-bef-auto-submit-click]');
+        const mediaQuery = $target.closest('form').data('bef-auto-submit-media-query');
+
+        // Don't submit when the document doesn't match the media query string.
+        if (mediaQuery && !matchMedia(mediaQuery).matches) {
+          return true;
+        }
 
         // Don't submit on changes to excluded elements,submit elements, or select2 autocomplete.
         if ($target.is('[data-bef-auto-submit-exclude], :submit, .select2-search__field, .chosen-search-input')) {

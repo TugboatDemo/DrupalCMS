@@ -3,10 +3,13 @@
 namespace Drupal\tagify\Element;
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element\Textfield;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
+use Drupal\tagify\TagifyHtmlFilterTrait;
 
 /**
  * Provides an entity autocomplete tagify form element.
@@ -41,9 +44,10 @@ use Drupal\Core\Url;
  *     dropdown.
  *  - #match_operator: (required) The autocomplete matching option.
  *  - #show_entity_id: (optional) The method uses to show the entity id.
+ *  - #parent_selection: (optional) The method uses to allow parent selection
+ *     in hierarchical entities.
  *  - #identifier: (optional) The field name to avoid conflicts when there are
  *     more than one element using Tagify.
- *
  * Usage example:
  * @code
  * $form['my_element'] = [
@@ -65,6 +69,7 @@ use Drupal\Core\Url;
  *  '#match_operator' => 'CONTAINS,
  *  '#show_entity_id' => 0,
  *  '#identifier' => 'field_name',
+ *  '#parent_selection' => 1,
  * ];
  * @endcode
  *
@@ -73,6 +78,8 @@ use Drupal\Core\Url;
  * @FormElement("entity_autocomplete_tagify")
  */
 class EntityAutocompleteTagify extends Textfield {
+
+  use TagifyHtmlFilterTrait;
 
   /**
    * {@inheritdoc}
@@ -93,6 +100,7 @@ class EntityAutocompleteTagify extends Textfield {
     $info['#show_entity_id'] = 0;
     $info['#info_label'] = '';
     $info['#identifier'] = '';
+    $info['#parent_selection'] = 1;
     array_unshift($info['#process'], [$class, 'processEntityAutocompleteTagify']);
 
     return $info;
@@ -126,13 +134,11 @@ class EntityAutocompleteTagify extends Textfield {
       $element['#attributes']['class'][] = 'autocreate';
     }
 
-    $element['#attached'] = [
+    $element['#attached'] = NestedArray::mergeDeep($element['#attached'] ?? [], [
       'library' => [
-        'tagify/tagify',
         'tagify/default',
-        'tagify/tagify_polyfils',
       ],
-    ];
+    ]);
 
     if (_tagify_is_gin_theme_active()) {
       $element['#attached']['library'][] = 'tagify/gin';
@@ -162,6 +168,7 @@ class EntityAutocompleteTagify extends Textfield {
     $element['#attributes']['data-show-entity-id'] = $element['#show_entity_id'] ?? '';
     $element['#attributes']['data-identifier'] = $element['#identifier'] ?? '';
     $element['#attributes']['data-cardinality'] = $element['#cardinality'] ?? '';
+    $element['#attributes']['data-parent-selection'] = $element['#parent_selection'] ?? '';
 
     // Store the selection settings in the key/value store and pass a hashed key
     // in the route parameters.
@@ -243,9 +250,15 @@ class EntityAutocompleteTagify extends Textfield {
     $entity_repository = \Drupal::service('entity.repository');
     $default_value = [];
     foreach ($entities as $entity) {
+      // Skip if entity is not an instance of EntityInterface.
+      if (!$entity instanceof EntityInterface) {
+        continue;
+      }
+
       // Set the entity in the correct language for display.
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       $entity = $entity_repository->getTranslationFromContext($entity);
+
       $entity_id = $entity->id();
       // Use the special view label, since some entities allow the label to be
       // viewed, even if the entity is not allowed to be viewed.
@@ -265,6 +278,10 @@ class EntityAutocompleteTagify extends Textfield {
       $context = ['entity' => $entity, 'info_label' => $info_label_template];
       \Drupal::moduleHandler()->alter('tagify_autocomplete_match', $label, $info_label, $context);
 
+      if ($info_label !== NULL) {
+        $info_label = self::filterHtmlWithImages($info_label);
+      }
+
       if ($label === NULL) {
         continue;
       }
@@ -276,6 +293,11 @@ class EntityAutocompleteTagify extends Textfield {
         'info_label' => $info_label,
         'editable' => FALSE,
       ];
+
+      // Add the parent name for hierarchical terms.
+      if ($entity_id && $entity->getEntityType() == 'taxonomy_term') {
+        $default_value['parent_name'] = \Drupal::service('tagify.hierarchical_term_manager')->getParentName($entity_id, $entity->bundle());
+      }
     }
 
     return json_encode($default_value);

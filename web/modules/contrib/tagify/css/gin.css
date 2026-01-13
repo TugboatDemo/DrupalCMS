@@ -68,6 +68,37 @@
   box-shadow: 0 0 0 2px var(--gin-color-primary-light-hover) inset !important;
 }
 
+.tagify.form-element--api-entity-autocomplete-tagify-hierarchical-term-list:focus,
+.tagify.form-element--api-entity-autocomplete-tagify-hierarchical-term-list:focus-within {
+  box-shadow:
+    0 0 0 1px var(--gin-color-focus-border),
+    0 0 0 4px var(--gin-color-focus) !important;
+}
+
+.tagify__dropdown__itemsGroup .dropdown_group {
+  color: var(--gin-color-primary) !important;
+}
+
+.tagify__dropdown__item--parent {
+  padding: 0.2rem 0.4rem !important;
+  cursor: pointer;
+}
+
+.tagify__dropdown__item--parent .dropdown_group {
+  padding: 0;
+}
+
+.tagify__dropdown__item--parent:hover,
+.tagify__dropdown__item--parent.tagify__dropdown__item--active {
+  background: var(--gin-color-primary) !important;
+}
+
+.tagify__dropdown__item--parent:hover .dropdown_group,
+.tagify__dropdown__item--parent.tagify__dropdown__item--active .dropdown_group {
+  color: #fff !important;
+  font-weight: 600;
+}
+
 /* Gin dark mode */
 .gin--dark-mode .tagify {
   --tag-text-color--edit: var(--gin-color-text);
@@ -86,6 +117,19 @@
 .gin--dark-mode .tagify__dropdown__item--active {
   color: var(--gin-color-primary-hover) !important;
   background-color: var(--gin-bg-item-hover) !important;
+}
+
+.gin--dark-mode .tagify__dropdown__item--parent:hover,
+.gin--dark-mode .tagify__dropdown__item--parent.tagify__dropdown__item--active {
+  background: var(--gin-color-primary-hover) !important;
+}
+
+.gin--dark-mode .tagify__dropdown__item--parent:hover .dropdown_group,
+.gin--dark-mode
+  .tagify__dropdown__item--parent.tagify__dropdown__item--active
+  .dropdown_group {
+  color: var(--gin-color-text) !important;
+  font-weight: 600;
 }
 
 .gin--dark-mode #tagify__tag-remove-button:hover {
@@ -190,4 +234,17 @@
     justify-content: space-between;
     white-space: unset !important;
   }
+}
+
+/* Fix tag styling in gin sidebar */
+#gin_sidebar .tagify__tag > div {
+  max-width: 85%;
+}
+
+#gin_sidebar .tagify__tag > div > * {
+  white-space: nowrap;
+}
+
+#gin_sidebar .tagify__tag {
+  max-width: 85%;
 }

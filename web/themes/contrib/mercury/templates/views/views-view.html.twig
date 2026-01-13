@@ -33,16 +33,8 @@
  * @see mercury_preprocess_views_view()
  */
 #}
-{%
-  set classes = [
-    'view',
-    'view-' ~ id|clean_class,
-    'view-id-' ~ id,
-    'view-display-id-' ~ display_id,
-    dom_id ? 'js-view-dom-id-' ~ dom_id,
-  ]
-%}
-<div{{ attributes.addClass(classes) }}>
+{% set classes = ['view', 'view-' ~ (id|clean_class), 'view-id-' ~ id, 'view-display-id-' ~ display_id, dom_id ? 'js-view-dom-id-' ~ dom_id] %}
+<div {{ attributes.addClass(classes) }}>
   {{ title_prefix }}
   {% if title %}
     {{ title }}
@@ -67,12 +59,16 @@
   {% block view_content %}
     {% if rows %}
       {% if snap %}
-        <div class="view-content view-snap hide-scrollbar-x hg:md:container hg:flex hg:md:grid hg:overflow-x-auto hg:snap-x hg:snap-mandatory hg:gap-3 hg:md:gap-8 hg:md:grid-cols-3 hg:md:overflow-x-visible hg:md:snap-none hg:md:mx-auto hg:relative hg:md:static hg:w-screen hg:md:w-auto hg:left-1/2 hg:md:left-0 hg:-translate-x-1/2 hg:md:translate-x-0">
-      {% else %}
-        <div class="view-content">
-      {% endif %}
+        <div
+          class="view-content view-snap hide-scrollbar-x relative left-1/2 flex w-screen -translate-x-1/2 snap-x snap-mandatory gap-3 overflow-x-auto md:static md:left-0 md:container md:mx-auto md:grid md:w-auto md:translate-x-0 md:snap-none md:grid-cols-3 md:gap-8 md:overflow-x-visible"
+        >
           {{ rows }}
         </div>
+      {% else %}
+        <div class="view-content">
+          {{ rows }}
+        </div>
+      {% endif %}
     {% elseif empty %}
       <div class="view-empty">
         {{ empty }}

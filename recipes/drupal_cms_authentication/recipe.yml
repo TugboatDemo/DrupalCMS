@@ -3,6 +3,7 @@ description: Adds useful authentication features.
 type: Drupal CMS
 install:
   - bpmn_io
+  - drupal_cms_helper
   - eca_base
   - eca_form
   - eca_misc
@@ -19,3 +20,6 @@ config:
     system.site:
       simpleConfigUpdate:
         page.403: '/user/login'
+    user.settings:
+      simpleConfigUpdate:
+        register: admin_only

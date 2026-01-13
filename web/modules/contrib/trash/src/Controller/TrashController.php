@@ -13,9 +13,12 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
+use Drupal\Core\Routing\TrustedRedirectResponse;
+use Drupal\Core\Url;
 use Drupal\trash\TrashManagerInterface;
 use Drupal\user\EntityOwnerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -49,13 +52,19 @@ class TrashController extends ControllerBase implements ContainerInjectionInterf
    * @return array
    *   A render array.
    */
-  public function listing(?string $entity_type_id = NULL) : array {
+  public function listing(?string $entity_type_id = NULL): array|RedirectResponse {
     $enabled_entity_types = $this->trashManager->getEnabledEntityTypes();
     if (empty($enabled_entity_types)) {
       throw new NotFoundHttpException();
     }
 
     $default_entity_type = in_array('node', $enabled_entity_types, TRUE) ? 'node' : reset($enabled_entity_types);
+
+    // Redirect to the main trash overview route for the default entity type.
+    if ($entity_type_id === $default_entity_type) {
+      return new TrustedRedirectResponse(Url::fromRoute('trash.admin_content_trash')->toString());
+    }
+
     $entity_type_id = $entity_type_id ?: $default_entity_type;
     if (!in_array($entity_type_id, $enabled_entity_types, TRUE)) {
       throw new NotFoundHttpException();

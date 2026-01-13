@@ -37,20 +37,20 @@ build project:
     - composer archive --file=byte
     - mkdir artifacts
     - mv byte.tar artifacts
-    - composer create-project drupal/cms:^2 --stability=alpha --no-install build
+    - composer create-project drupal/cms:^2 --stability=beta --no-install build
     - cd build
-    # Configure Composer to install Byte from the archive we just created.
-    - composer config minimum-stability dev
-    - composer config repositories.byte artifact $CI_PROJECT_DIR/artifacts
-    # Enable plugins required by drupal/core-dev, and allow patches to be applied.
+    # Drupal CMS 2 is in development, so allow dev versions of all dependencies.
+    - composer config minimum-stability beta
+    # Enable plugins required by drupal/core-dev.
     - composer config allow-plugins.phpstan/extension-installer true
     - composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-    # @todo Disable this line after Drupal >=11.2.6 AND Canvas >=1.0.0-rc3.
-    - composer config allow-plugins.cweagans/composer-patches true
-    - composer require --no-update --dev drupal/core-dev:^11 cweagans/composer-patches:^2
-    # Temporarily require a version of Drupal CMS Starter that uses Mercury's dev branch.
-    - composer require --no-update drupal/drupal_cms_starter:2.x-dev
-    - composer require --no-update drupal/mercury:1.x-dev
+    - composer require --no-update --dev drupal/core-dev:^11
+    # Temporarily require Byte Themes's dev branch.
+    - composer require --no-update drupal/byte_theme:1.x-dev@dev
+    # Configure Composer to install Byte from the archive we just created.
+    - composer config repositories.byte artifact $CI_PROJECT_DIR/artifacts
+    - composer require --no-update drupal/byte:1.x-dev@dev
+    # Build the code base.
     - composer install
   artifacts:
     paths:

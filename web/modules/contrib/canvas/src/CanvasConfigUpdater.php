@@ -12,6 +12,7 @@ use Drupal\canvas\PropExpressions\StructuredData\ReferenceFieldPropExpression;
 use Drupal\canvas\PropExpressions\StructuredData\ReferenceFieldTypePropExpression;
 use Drupal\canvas\ComponentSource\ComponentSourceManager;
 use Drupal\canvas\Entity\Component;
+use Drupal\canvas\Utility\ComponentMetadataHelper;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\canvas\Entity\ComponentTreeEntityInterface;
 use Drupal\canvas\Entity\JavaScriptComponent;
@@ -223,6 +224,20 @@ class CanvasConfigUpdater {
     // loaded. (Not strictly necessary, just a precaution.)
     $component->loadVersion($originally_loaded_version);
     return $needs_updating;
+  }
+
+  public function unsetComponentCategoryProperty(Component $component): bool {
+    if (!is_null($component->get('category'))) {
+      $component->set('category', NULL);
+      $deprecations_triggered = &$this->triggeredDeprecations['3549726'][$component->id()];
+      if ($this->deprecationsEnabled && !$deprecations_triggered) {
+        $deprecations_triggered = TRUE;
+        // phpcs:ignore
+        @trigger_error(\sprintf('%s with ID %s provides a category that will be ignored, this is deprecated in canvas:1.0.2 and will be removed in canvas:2.0.0. See https://www.drupal.org/node/3557215', $component->getEntityType()->getLabel(), $component->id()), E_USER_DEPRECATED);
+      }
+      return TRUE;
+    }
+    return FALSE;
   }
 
   public function updatePropFieldDefinitionsWithRequiredFlag(Component $component) : bool {
@@ -470,6 +485,61 @@ class CanvasConfigUpdater {
     }
 
     return $active_version_updated || $past_version_updated;
+  }
+
+  public function needsPropReordering(Component $component): bool {
+    $component_source = $component->getComponentSource();
+    // @see `type: canvas.generated_field_explicit_input_ux`
+    if (!$component_source instanceof GeneratedFieldExplicitInputUxComponentSourceBase) {
+      return FALSE;
+    }
+
+    // Track the originally loaded version to enable avoiding side effects.
+    $originally_loaded_version = $component->getLoadedVersion();
+
+    // Only the active version needs its prop order corrected, potentially.
+    $component->resetToActiveVersion();
+
+    $settings = $component->getSettings();
+    assert(\array_key_exists('prop_field_definitions', $settings));
+    $stored_prop_order = array_keys($settings['prop_field_definitions']);
+
+    $metadata = $component_source->getMetadata();
+    $actual_prop_order = array_keys(ComponentMetadataHelper::getNonAttributeComponentProperties($metadata));
+
+    // Avoid side effects: ensure the given Component still has the same version
+    // loaded. (Not strictly necessary, just a precaution.)
+    $component->loadVersion($originally_loaded_version);
+    return $stored_prop_order !== $actual_prop_order;
+  }
+
+  public function updatePropOrder(Component $component) : bool {
+    if (!$this->needsPropReordering($component)) {
+      return FALSE;
+    }
+
+    $component_source = $component->getComponentSource();
+    \assert($component_source instanceof GeneratedFieldExplicitInputUxComponentSourceBase);
+    $metadata = $component_source->getMetadata();
+    $actual_prop_order = array_keys(ComponentMetadataHelper::getNonAttributeComponentProperties($metadata));
+
+    // Reorder the prop field definitions to match the actual prop order.
+    $settings = $component->getSettings();
+    $settings['prop_field_definitions'] = array_replace(
+      array_flip($actual_prop_order),
+      $settings['prop_field_definitions']
+    );
+    // If new props appeared, or they didn't have a proper definition match,
+    // this is not the right time to include them.
+    $settings['prop_field_definitions'] = array_filter($settings['prop_field_definitions'], function ($value) {
+      return is_array($value);
+    });
+    $component->setSettings($settings);
+
+    // ⚠️ Reordering props does not cause a new version to be created!
+    // @see \Drupal\canvas\ComponentSource\ComponentSourceBase::generateVersionHash()
+
+    return TRUE;
   }
 
 }

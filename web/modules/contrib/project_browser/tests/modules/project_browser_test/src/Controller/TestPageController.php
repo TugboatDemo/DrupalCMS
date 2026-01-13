@@ -38,6 +38,11 @@ final class TestPageController extends ControllerBase {
       $filters = [];
     }
 
+    // Pass in the instances where you do not want pagination. Use 1-based
+    // counting. So pass [3] if you don't want pagination on the 3rd instance.
+    $no_paginate = array_filter($request->get(key: 'no_paginate', default: []), 'is_numeric');
+    $no_paginate = array_map('intval', $no_paginate);
+
     $build = [];
     for ($i = 0; $i < $request->query->getInt('instances', 1); $i++) {
       $build[$i] = [
@@ -48,6 +53,7 @@ final class TestPageController extends ControllerBase {
         ],
         '#sort_options' => $sort_options,
         '#filters' => $filters,
+        '#paginate' => !in_array(needle: $i + 1, haystack: $no_paginate, strict: TRUE),
       ];
     }
     return $build;

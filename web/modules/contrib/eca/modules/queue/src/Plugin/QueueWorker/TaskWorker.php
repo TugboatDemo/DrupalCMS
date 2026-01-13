@@ -3,11 +3,13 @@
 namespace Drupal\eca_queue\Plugin\QueueWorker;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Queue\Attribute\QueueWorker;
 use Drupal\Core\Queue\DelayableQueueInterface;
 use Drupal\Core\Queue\QueueFactory;
 use Drupal\Core\Queue\QueueWorkerBase;
 use Drupal\Core\Queue\DelayedRequeueException;
 use Drupal\Core\Queue\RequeueException;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\eca\Token\TokenInterface;
 use Drupal\eca_queue\Event\ProcessingTaskEvent;
 use Drupal\eca_queue\Exception\NotYetDueForProcessingException;
@@ -18,14 +20,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Processes enqueued ECA tasks.
- *
- * @QueueWorker(
- *   id = "eca_task",
- *   title = @Translation("ECA Tasks"),
- *   cron = {"time" = 15},
- *   deriver = "Drupal\eca_queue\Plugin\QueueWorker\TaskWorkerDeriver"
- * )
  */
+#[QueueWorker(
+  id: 'eca_task',
+  title: new TranslatableMarkup('ECA Tasks'),
+  cron: ['time' => 15],
+  deriver: TaskWorkerDeriver::class
+)]
 final class TaskWorker extends QueueWorkerBase implements ContainerFactoryPluginInterface {
 
   /**
